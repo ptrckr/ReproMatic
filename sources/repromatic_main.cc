@@ -5,13 +5,14 @@
 
 #include <string>
 #include <sstream>
+#include <cstdio>
 
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
 #endif
 
 #include "repromatic.h"
-#include "acrobat_tools.h"
+#include "acrobat_utils.h"
 #include "page_dictionary.h"
 
 // Sort
@@ -34,7 +35,9 @@ void Sort(bool extended = false) {
     first_avdoc = AVDocOpenFromFile(first_file, file_system, NULL);
   }
 
-  AVStatusMonitorProcsRec status_monitor = repromatic::acrobat_tools::GetStatusMonitor();
+  ASFileSysReleasePath(file_system, first_file);
+
+  AVStatusMonitorProcsRec status_monitor = repromatic::acrobat_utils::GetStatusMonitor();
 
   int file_pdf_count = 0;
   int folder_count = 0;
@@ -52,7 +55,14 @@ void Sort(bool extended = false) {
       if (status_monitor.progMon && status_monitor.progMon->setText) {
         ASText pdf_file_name = ASTextNew();
         if (ASFileSysGetNameFromPathAsASText(file_system, as_item_path, pdf_file_name) == 0) {
-          status_monitor.progMon->setText(pdf_file_name, status_monitor.progMonClientData);
+          char *pdf_file_name_cstr = ASTextGetEncodedCopy(pdf_file_name, AVAppGetLanguageEncoding());
+
+          char status_monitor_message[48];
+          std::sprintf(status_monitor_message, "%3d%% @ %-40.40s", (100 / total_file_count * current_file_iteration), pdf_file_name_cstr);
+
+          ASfree(pdf_file_name_cstr);
+
+          status_monitor.progMon->setText(ASTextFromEncoded(status_monitor_message, AVAppGetLanguageEncoding()), status_monitor.progMonClientData);
         }
       }
 
@@ -130,12 +140,15 @@ void Overview(bool extended = false) {
 
     // Open a file to be able to get a status monitor.
     ASPathName first_file = repromatic::GetFirstPdfFileInFolder(file_system, folder);
+
     AVDoc first_avdoc = NULL;
     if (first_file != NULL) {
       first_avdoc = AVDocOpenFromFile(first_file, file_system, NULL);
     }
 
-    AVStatusMonitorProcsRec status_monitor = repromatic::acrobat_tools::GetStatusMonitor();
+    ASFileSysReleasePath(file_system, first_file);
+
+    AVStatusMonitorProcsRec status_monitor = repromatic::acrobat_utils::GetStatusMonitor();
 
     int file_pdf_count = 0;
     int file_non_pdf_count = 0;
@@ -154,7 +167,14 @@ void Overview(bool extended = false) {
         if (status_monitor.progMon && status_monitor.progMon->setText) {
           ASText pdf_file_name = ASTextNew();
           if (ASFileSysGetNameFromPathAsASText(file_system, as_item_path, pdf_file_name) == 0) {
-            status_monitor.progMon->setText(pdf_file_name, status_monitor.progMonClientData);
+            char *pdf_file_name_cstr = ASTextGetEncodedCopy(pdf_file_name, AVAppGetLanguageEncoding());
+
+            char status_monitor_message[48];
+            std::sprintf(status_monitor_message, "%3d%% @ %-40.40s", (100 / total_file_count * current_file_iteration), pdf_file_name_cstr);
+
+            ASfree(pdf_file_name_cstr);
+
+            status_monitor.progMon->setText(ASTextFromEncoded(status_monitor_message, AVAppGetLanguageEncoding()), status_monitor.progMonClientData);
           }
         }
 

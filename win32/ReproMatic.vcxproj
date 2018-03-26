@@ -87,7 +87,7 @@ if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not se
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\sources\acrobat_tools.cc" />
+    <ClCompile Include="..\sources\acrobat_utils.cc" />
     <ClCompile Include="..\sources\convert_print_units.cc" />
     <ClCompile Include="..\sources\din.cc" />
     <ClCompile Include="..\sources\din_wrapper.cc" />
@@ -109,7 +109,7 @@ if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not se
     <ClCompile Include="..\..\Headers\Api\PIMain.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\sources\acrobat_tools.h" />
+    <ClInclude Include="..\sources\acrobat_utils.h" />
     <ClInclude Include="..\sources\convert_print_units.h" />
     <ClInclude Include="..\sources\din.h" />
     <ClInclude Include="..\sources\din_wrapper.h" />

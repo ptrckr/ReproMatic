@@ -6,6 +6,7 @@
 #include "repromatic.h"
 #include <string>
 #include <functional>
+#include <regex>
 
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
@@ -42,18 +43,18 @@ void IterateFolder(
 
   if (folder_iterator == NULL) return;
 
-  std::string file_extension_filter = ".pdf";
-
+  std::regex is_pdf(R"(.*\.pdf$)", std::regex::icase);
   do {
     if (props.type == kASFileSysFile) {
-      std::string item_path = ASFileSysDIPathFromPath(file_system, as_item_path, NULL);
+      char *item_path = ASFileSysDIPathFromPath(file_system, as_item_path, NULL);
 
-      if (item_path.length() > file_extension_filter.length() &&
-          item_path.substr(item_path.length() - file_extension_filter.length()) == file_extension_filter) {
+      if (std::regex_match(item_path, is_pdf)) {
         callback(file_system, root, as_item_path, "file_pdf");
       } else {
         callback(file_system, root, as_item_path, "file_non_pdf");
       }
+
+      ASfree(item_path);
     } else if (props.type == kASFileSysFolder) {
       ASText folder_name = ASTextNew();
 
@@ -88,21 +89,17 @@ int GetItemCount(ASPathName root, ASFileSys file_system, std::string filter) {
 }
 
 ASPathName GetFirstPdfFileInFolder(ASFileSys file_system, ASPathName folder) {
-  ASPathName first_file = NULL;
+  ASPathName first_file = nullptr;
   bool found_first_file = false;
 
   std::function<bool()> continue_iteration = [&found_first_file]() -> bool {
-    if (!found_first_file) {
-      return true;
-    } else {
-      return false;
-    }
+    return !found_first_file ? true : false;
   };
 
   IterateFolder(file_system, folder, folder, [&found_first_file, &first_file](ASFileSys file_system, ASPathName root, ASPathName item_path, std::string item_type) -> void {
     if (item_type == "file_pdf") {
       found_first_file = true;
-      first_file = item_path;
+      first_file = ASFileSysCopyPath(file_system, item_path);
     }
   }, continue_iteration);
 
