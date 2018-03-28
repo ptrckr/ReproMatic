@@ -7,6 +7,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <sstream>
 
 namespace repromatic {
 
@@ -34,56 +35,69 @@ void DinWrapper::AddFormat(std::string din_key, std::string size_key, int page_n
   formats[din_key][size_key].push_back(page_num);
 }
 
-std::string DinWrapper::ToString(bool print_pages) {
-  std::string output;
-
-  std::map<std::string, std::map<std::string, std::vector<int>>>::iterator it;
-  for (it = formats.begin(); it != formats.end(); it++) {
-    output += it->first + ", ";
-
-    int format_total_count = 0;
-    std::map<std::string, std::vector<int>>::iterator it2;
-    for (it2 = formats[it->first].begin(); it2 != formats[it->first].end(); it2++) {
-      format_total_count += it2->second.size();
+std::string DinWrapper::ToString(bool print_sizes, bool print_pages) {
+  std::stringstream o;
+  
+  for (auto i = formats.begin(); i != formats.end(); ++i) {
+    const std::string &i_key = i->first;
+    const auto &i_value = i->second;
+    
+    int page_count = 0;
+    for (const auto &pages : i_value) {
+      page_count += pages.second.size();
     }
-
-    output += std::to_string(format_total_count) + " Page" + (format_total_count > 1 ? "s" : "") + "\n";
-
-    for (it2 = formats[it->first].begin(); it2 != formats[it->first].end(); it2++) {
-      output += "• " + it2->first + " (" + std::to_string(it2->second.size()) + ")";
-
-      if (print_pages) {
-        output += " @ [";
-
-        int start = 0;
-        int steps = 0;
-        for (unsigned int i = 0; i < it2->second.size(); i++) {
-          if (i < it2->second.size() - 1 && it2->second[start] + steps == it2->second[i + 1] - 1) {
-            steps++;
-          } else {
-            if (steps > 0) {
-              output += std::to_string(it2->second[i - steps]) + "-" + std::to_string(it2->second[i]);
-            } else {
-              output += std::to_string(it2->second[i]);
+    
+    if (!print_sizes) o << "• ";
+    o << i_key << ": " << page_count << " Page";
+    o << (page_count > 1 ? "s" : "") << std::endl;
+    
+    if (print_sizes) {
+      for (auto j = i_value.begin(); j != i_value.end(); ++j) {
+        const std::string &j_key = j->first;
+        const auto &j_value = j->second;
+        
+        o << "• " << j_key << " (" << j_value.size() << ")";
+        
+        if (print_pages) {
+          o << " @ [";
+          
+          int start = *j_value.begin();
+          auto next = ++j_value.begin();
+          int range = 0;
+          for (auto k = j_value.begin(); k != j_value.end(); ++k) {
+            if (start + 1 + range == *next) {
+              ++range;
+              ++next;
+              continue;
             }
-
-            if (i < it2->second.size() - 1) output += ", ";
-
-            start = i + 1;
-            steps = 0;
+            
+            o << start;
+            if (range > 0) o << "-" << start + range;
+            if (k != --j_value.end()) o << ", ";
+            
+            start = *next++;
+            range = 0;
           }
+          
+          o << "]";
         }
-
-        output += "]";
+        
+        if (i_value.size() > 20) {
+          if (j != --i_value.end()) {
+            o << ", ";
+          } else {
+            o << std::endl;
+          }
+        } else{
+          o << std::endl;
+        }
+  
+        if (i != --formats.end() && j == --i_value.end()) o << std::endl;
       }
-
-      output += "\n";
     }
-
-    if (it != --formats.end()) output += "\n";
   }
-
-  return output;
+  
+  return o.str();
 }
 
 }  // repromatic

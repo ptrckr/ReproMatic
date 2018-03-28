@@ -16,7 +16,7 @@ struct DinWrapper {
 
   void AddFormat(std::string din_key, std::string size_key, int page_num);
 
-  std::string ToString(bool print_pages = true);
+  std::string ToString(bool print_sizes = true, bool print_pages = true);
 };
 
 }  // repromatic

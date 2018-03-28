@@ -137,7 +137,7 @@ void Overview(bool extended = false) {
   if (avActiveDocument) {
     PDDoc pdActiveDocument = AVDocGetPDDoc(avActiveDocument);
     page_dict.AddPagesFrom(pdActiveDocument);
-    AVAlertNote(page_dict.dinWrapper.ToString(true).c_str());
+    AVAlertNote(page_dict.dinWrapper.ToString().c_str());
   } else {
     AVOpenSaveDialogParamsRec params;
     memset(&params, NULL, sizeof(AVOpenSaveDialogParamsRec));
@@ -217,7 +217,7 @@ void Overview(bool extended = false) {
     alert << "Searched `" << ASFileSysDIPathFromPath(NULL, folder, NULL) << "'." << std::endl;
     alert << "• " << file_pdf_count << " PDF file" << (file_pdf_count > 1 ? "s" : "");
     alert << " in " << folder_count << " sub folder" << (folder_count > 1 ? "s" : "") << "." << std::endl << std::endl;
-    alert << page_dict.dinWrapper.ToString(false);
+    alert << page_dict.dinWrapper.ToString(true, false);
 
     AVAlertNote(alert.str().c_str());
   }
