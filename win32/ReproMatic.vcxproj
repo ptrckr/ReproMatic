@@ -90,7 +90,6 @@ if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not se
     <ClCompile Include="..\sources\acrobat_utils.cc" />
     <ClCompile Include="..\sources\convert_print_units.cc" />
     <ClCompile Include="..\sources\din.cc" />
-    <ClCompile Include="..\sources\din_wrapper.cc" />
     <ClCompile Include="..\sources\page.cc" />
     <ClCompile Include="..\sources\page_dictionary.cc" />
     <ClCompile Include="..\sources\repromatic.cc" />
@@ -112,7 +111,6 @@ if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not se
     <ClInclude Include="..\sources\acrobat_utils.h" />
     <ClInclude Include="..\sources\convert_print_units.h" />
     <ClInclude Include="..\sources\din.h" />
-    <ClInclude Include="..\sources\din_wrapper.h" />
     <ClInclude Include="..\sources\page.h" />
     <ClInclude Include="..\sources\page_dictionary.h" />
     <ClInclude Include="..\sources\repromatic.h" />

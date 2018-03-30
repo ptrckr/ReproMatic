@@ -9,7 +9,6 @@
 #include <vector>
 #include <string>
 #include "page.h"
-#include "din_wrapper.h"
 
 namespace repromatic {
 
@@ -17,11 +16,11 @@ class PageDictionary {
   std::vector<Page> pages;
 
   public:
-    DinWrapper dinWrapper;
-
     void AddPagesFrom(PDDoc pd_doc);
 
     std::string GetDinKey();
+
+    std::string ToString(bool print_sizes = true, bool print_pages = true);
 };
 
 }  // repromatic

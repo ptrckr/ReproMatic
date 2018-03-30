@@ -15,17 +15,24 @@
 
 namespace repromatic {
 
-struct Page {
-  int number;
+struct PageFormat {
   float width;
   float height;
+  int fits_in_din_size;
+  bool is_landscape;
+
   bool is_din;
-  din::Format din;
+  int din_size;
+};
+
+struct Page {
+  int number;
+  PageFormat format;
     
-  Page(PDPage pd_page, int page_num);
-  std::string GetDinKey();
-  std::string GetSizeKey();
-  int GetDisplayPageNumber();
+  Page(PDPage pd_page, int number);
+  std::string GetDinKey() const;
+  std::string GetSizeKey() const;
+  int GetDisplayPageNumber() const;
 };
 
 }  // repromatic
