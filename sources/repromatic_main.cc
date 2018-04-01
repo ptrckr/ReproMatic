@@ -18,7 +18,7 @@
 // Sort
 // ====
 
-void Sort(bool extended = false) {
+void Sort(bool detailed = true) {
   AVOpenSaveDialogParamsRec params;
   memset(&params, NULL, sizeof(AVOpenSaveDialogParamsRec));
   params.size = sizeof(AVOpenSaveDialogParamsRec);
@@ -123,21 +123,21 @@ void Sort(bool extended = false) {
 }
 
 // Sort Callbacks
-ACCB1 ASBool ACCB2 SortExtendedIsEnabled(void *clientData) { return true; }
-ACCB1 void ACCB2 SortExtended(void *clientData) { Sort(true); };
+ACCB1 void ACCB2 SortRecursive(void *clientData) { Sort(true); };
+ACCB1 ASBool ACCB2 SortRecursiveIsEnabled(void *clientData) { return true; }
 
 
-// Overview
-// ========
+// Summary
+// =======
 
-void Overview(bool extended = false) {
+void Summary(bool detailed = true) {
   repromatic::PageDictionary page_dict;
   AVDoc avActiveDocument = AVAppGetActiveDoc();
 
   if (avActiveDocument) {
     PDDoc pdActiveDocument = AVDocGetPDDoc(avActiveDocument);
     page_dict.AddPagesFrom(pdActiveDocument);
-    AVAlertNote(page_dict.ToString().c_str());
+    AVAlertNote(page_dict.ToString(detailed).c_str());
   } else {
     AVOpenSaveDialogParamsRec params;
     memset(&params, NULL, sizeof(AVOpenSaveDialogParamsRec));
@@ -217,15 +217,16 @@ void Overview(bool extended = false) {
     alert << "Searched `" << ASFileSysDIPathFromPath(NULL, folder, NULL) << "'." << std::endl;
     alert << "• " << file_pdf_count << " PDF file" << (file_pdf_count > 1 ? "s" : "");
     alert << " in " << folder_count << " sub folder" << (folder_count > 1 ? "s" : "") << "." << std::endl << std::endl;
-    alert << page_dict.ToString(true, false);
+    alert << page_dict.ToString(detailed, false);
 
     AVAlertNote(alert.str().c_str());
   }
 }
 
-// Overview Callbacks
-ACCB1 ASBool ACCB2 OverviewExtendedIsEnabled(void *clientData) { return true; }
-ACCB1 void ACCB2 OverviewExtended(void *clientData) { Overview(true); }
+// Summary Callbacks
+ACCB1 void ACCB2 PdfFormatSummarySimple(void *clientData) { Summary(false); }
+ACCB1 void ACCB2 PdfFormatSummaryDetailed(void *clientData) { Summary(true); }
+ACCB1 ASBool ACCB2 PdfFormatSummaryIsEnabled(void *clientData) { return true; }
 
 
 // Divider

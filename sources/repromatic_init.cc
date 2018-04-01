@@ -3,30 +3,29 @@
 //  Created by ptrckr on 28.02.18.	
 //	
 
+#include <string>
+#include <vector>
+
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
 #endif
 
-// Menus
-// =====
+#include "acrobat_utils.h"
 
-static AVMenuItem overviewMenu = NULL;
-static AVMenuItem overviewMenuItem = NULL;
+// Menu Manager
+// ============
 
-static AVMenuItem sortMenu = NULL;
-static AVMenuItem sortMenuItem = NULL;
-
-static AVMenuItem dividerMenu = NULL;
-static AVMenuItem dividerMenuItem = NULL;
+static repromatic::acrobat_utils::MenuUtil MenuManager;
 
 // Menu Items
 // ==========
 
-extern ACCB1 void ACCB2 SortExtended(void *clientData);
-extern ACCB1 ASBool ACCB2 SortExtendedIsEnabled(void *clientData);
+extern ACCB1 void ACCB2 SortRecursive(void *clientData);  // repromatic_main.cc
+extern ACCB1 ASBool ACCB2 SortRecursiveIsEnabled(void *clientData);  // repromatic_main.cc
 
-extern ACCB1 void ACCB2 OverviewExtended(void *clientData);
-extern ACCB1 ASBool ACCB2 OverviewExtendedIsEnabled(void *clientData);
+extern ACCB1 void ACCB2 PdfFormatSummarySimple(void *clientData);  // repromatic_main.cc
+extern ACCB1 void ACCB2 PdfFormatSummaryDetailed(void *clientData);  // repromatic_main.cc
+extern ACCB1 ASBool ACCB2 PdfFormatSummaryIsEnabled(void *clientData);  // repromatic_main.cc
 
 extern ACCB1 void ACCB2 Divider(void *clientData);
 extern ACCB1 ASBool ACCB2 DividerIsEnabled(void *clientData);
@@ -50,18 +49,13 @@ ACCB1 ASBool ACCB2 PluginImportReplaceAndRegister(void) {
 }
 
 ACCB1 ASBool ACCB2 PluginInit(void) {
+  MenuManager.Init();
+
   return ReproInit();
 }
 
 ACCB1 ASBool ACCB2 PluginUnload(void) {
-  if (overviewMenu) AVMenuItemRemove(overviewMenu);
-  if (overviewMenuItem) AVMenuItemRemove(overviewMenuItem);
-
-  if (sortMenu) AVMenuItemRemove(sortMenu);
-  if (sortMenuItem) AVMenuItemRemove(sortMenuItem);
-
-  if (dividerMenu) AVMenuItemRemove(dividerMenu);
-  if (dividerMenuItem) AVMenuItemRemove(dividerMenuItem);
+  MenuManager.RemoveMenuItems();
 
   return true;
 }
@@ -81,71 +75,30 @@ ACCB1 ASBool ACCB2 PIHandshake(Uns32 handshakeVersion, void *handshakeData) {
 }
 
 ACCB1 ASBool ACCB2 ReproInit() {
-  AVMenubar menubar = AVAppGetMenubar();
-  AVMenu volatile acrobatMainMenu = NULL;
-  AVMenu volatile overviewMenuParent = NULL;
-  AVMenu volatile sortMenuParent = NULL;
-  AVMenu volatile dividerMenuParent = NULL;
-
-  if (!menubar) return false;
-
   DURING
-    acrobatMainMenu = AVMenubarAcquireMenuByName(menubar, "PTRK:ReproMatic");
+    MenuManager.AddMenuItemToMenu(
+      "Sort Folder", "Recursive",
+      ASCallbackCreateProto(AVExecuteProc, SortRecursive),
+      ASCallbackCreateProto(AVComputeEnabledProc, SortRecursiveIsEnabled)
+    );
 
-    if (!acrobatMainMenu) {
-      acrobatMainMenu = AVMenuNew("ReproMatic", "PTRK:ReproMatic", gExtensionID);
-      AVMenubarAddMenu(menubar, acrobatMainMenu, APPEND_MENU);
-    }
+    MenuManager.AddMenuItemToMenu(
+      "PDF Format Summary", "Simple",
+      ASCallbackCreateProto(AVExecuteProc, PdfFormatSummarySimple),
+      ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled)
+    );
 
-    // Overview Menu
-    overviewMenuParent = AVMenuNew("overviewMenu", "PTRK:overviewMenuParent", gExtensionID);
-    overviewMenu = AVMenuItemNew("Overview", "PTRK:overviewMenu", overviewMenuParent, true, NO_SHORTCUT, 0, NULL, gExtensionID);
+    MenuManager.AddMenuItemToMenu(
+      "PDF Format Summary", "Detailed",
+      ASCallbackCreateProto(AVExecuteProc, PdfFormatSummaryDetailed),
+      ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled)
+    );
 
-    // Overview Extended
-    overviewMenuItem = AVMenuItemNew("Overview Extended", "PTRK:Overview", NULL, true, NO_SHORTCUT, 0, NULL, gExtensionID);
-    AVMenuItemSetExecuteProc(overviewMenuItem, ASCallbackCreateProto(AVExecuteProc, OverviewExtended), NULL);
-    AVMenuItemSetComputeEnabledProc(overviewMenuItem, ASCallbackCreateProto(AVComputeEnabledProc, OverviewExtendedIsEnabled), (void *)pdPermEdit);
-    AVMenuAddMenuItem(overviewMenuParent, overviewMenuItem, APPEND_MENUITEM);
-
-    AVMenuAddMenuItem(acrobatMainMenu, overviewMenu, APPEND_MENUITEM);
-
-    // Sort Menu
-    sortMenuParent = AVMenuNew("sortMenu", "PTRK:sortMenu", gExtensionID);
-    sortMenu = AVMenuItemNew("Sort", "PTRK:sortMenuItem", sortMenuParent, true, NO_SHORTCUT, 0, NULL, gExtensionID);
-
-    // Sort Extended
-    sortMenuItem = AVMenuItemNew("Sort Extended", "PTRK:Sort", NULL, true, NO_SHORTCUT, 0, NULL, gExtensionID);
-    AVMenuItemSetExecuteProc(sortMenuItem, ASCallbackCreateProto(AVExecuteProc, SortExtended), NULL);
-    AVMenuItemSetComputeEnabledProc(sortMenuItem, ASCallbackCreateProto(AVComputeEnabledProc, SortExtendedIsEnabled), (void *)pdPermEdit);
-    AVMenuAddMenuItem(sortMenuParent, sortMenuItem, APPEND_MENUITEM);
-
-    AVMenuAddMenuItem(acrobatMainMenu, sortMenu, APPEND_MENUITEM);
-
-    // Divider Menu
-    dividerMenuParent = AVMenuNew("dividerMenu", "PTRK:dividerMenu", gExtensionID);
-    dividerMenu = AVMenuItemNew("Paper Divider", "PTRK:dividerMenuItem", dividerMenuParent, true, NO_SHORTCUT, 0, NULL, gExtensionID);
-
-    // Divider
-    dividerMenuItem = AVMenuItemNew("Create Paper Divider", "PTRK:Divider", NULL, true, NO_SHORTCUT, 0, NULL, gExtensionID);
-    AVMenuItemSetExecuteProc(dividerMenuItem, ASCallbackCreateProto(AVExecuteProc, Divider), NULL);
-    AVMenuItemSetComputeEnabledProc(dividerMenuItem, ASCallbackCreateProto(AVComputeEnabledProc, DividerIsEnabled), (void *)pdPermEdit);
-    AVMenuAddMenuItem(dividerMenuParent, dividerMenuItem, APPEND_MENUITEM);
-
-    AVMenuAddMenuItem(acrobatMainMenu, dividerMenu, APPEND_MENUITEM);
-
-    AVMenuRelease(overviewMenuParent);
-    AVMenuRelease(sortMenuParent);
-    AVMenuRelease(dividerMenuParent);
-    AVMenuRelease(acrobatMainMenu);
-
+    MenuManager.ReleaseMenus();
   HANDLER
-    if (overviewMenuParent) AVMenuRelease(overviewMenuParent);
-    if (sortMenuParent) AVMenuRelease(sortMenuParent);
-    if (dividerMenuParent) AVMenuRelease(dividerMenuParent);
-    if (acrobatMainMenu) AVMenuRelease(acrobatMainMenu);
-      
-    return false;
+    MenuManager.ReleaseMenus();
 
+    return false;
   END_HANDLER
 
   return true;

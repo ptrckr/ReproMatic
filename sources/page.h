@@ -7,11 +7,12 @@
 #define REPROMATIC_PAGE_H
 
 #include <string>
-#include "din.h"
 
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
 #endif  
+
+#include "din.h"
 
 namespace repromatic {
 

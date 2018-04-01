@@ -8,13 +8,14 @@
 #include <sstream>
 #include <algorithm>
 #include <iomanip>
-#include "repromatic.h"
-#include "convert_print_units.h"
-#include "din.h"
 
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
 #endif
+
+#include "repromatic.h"
+#include "convert_print_units.h"
+#include "din.h"
 
 namespace repromatic {
 

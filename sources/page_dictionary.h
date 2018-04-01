@@ -17,10 +17,8 @@ class PageDictionary {
 
   public:
     void AddPagesFrom(PDDoc pd_doc);
-
-    std::string GetDinKey();
-
-    std::string ToString(bool print_sizes = true, bool print_pages = true);
+    std::string GetDinKey() const;
+    std::string ToString(bool print_sizes = true, bool print_pages = true) const;
 };
 
 }  // repromatic

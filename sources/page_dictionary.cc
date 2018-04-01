@@ -23,18 +23,18 @@ void PageDictionary::AddPagesFrom(PDDoc pd_doc) {
   }
 }
 
-std::string PageDictionary::GetDinKey() {
-  std::vector<std::string> keys;
+std::string PageDictionary::GetDinKey() const {
   std::string key;
+  std::vector<std::string> keys;
 
-  for (std::vector<Page>::iterator i = pages.begin(); i != pages.end(); ++i) {
-    keys.push_back((*i).GetDinKey());
+  for (const Page &page : pages) {
+    keys.push_back(page.GetDinKey());
   }
 
   std::sort(keys.begin(), keys.end());
   keys.erase(std::unique(keys.begin(), keys.end()), keys.end());
 
-  for (std::vector<std::string>::iterator i = keys.begin(); i != keys.end(); ++i) {
+  for (auto i = keys.begin(); i != keys.end(); ++i) {
     key += *i;
 
     if (i != --keys.end()) key += ", ";
@@ -43,11 +43,13 @@ std::string PageDictionary::GetDinKey() {
   return key;
 }
 
-std::string PageDictionary::ToString(bool print_sizes, bool print_pages) {
+std::string PageDictionary::ToString(bool print_sizes, bool print_pages) const {
   std::map<std::string, std::map<std::string, std::vector<int>>> ordered_pages;
 
   for (const Page &page : pages) {
-    ordered_pages[page.GetDinKey()][page.GetSizeKey()].push_back(page.GetDisplayPageNumber());
+    ordered_pages[page.GetDinKey()][page.GetSizeKey()].push_back(
+      page.GetDisplayPageNumber()
+    );
   }
 
   std::stringstream o;
