@@ -60,7 +60,10 @@ void IterateFolder(
 
       if (ASFileSysGetNameFromPathAsASText(file_system, as_item_path, folder_name) != 0) {
         AVAlert(ALERT_STOP, "Folder name could not be retrieved.", "OK", NULL, NULL, true);
-      } else if (ASTextCaseSensitiveCmp(folder_name, ASTextFromEncoded("Sorted", AVAppGetLanguageEncoding())) != 0) {
+      } else if (
+        ASTextCaseSensitiveCmp(folder_name, ASTextFromEncoded("Sorted", AVAppGetLanguageEncoding())) != 0 &&
+        ASTextCaseSensitiveCmp(folder_name, ASTextFromEncoded("Extracted", AVAppGetLanguageEncoding())) != 0
+      ) {
         callback(file_system, root, as_item_path, "folder");
         IterateFolder(file_system, root, as_item_path, callback, continue_iteration );
       }

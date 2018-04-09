@@ -38,6 +38,20 @@ public:
   );
 };
 
+class StatusMonitorUtil {
+private:
+  AVStatusMonitorProcsRec monitor;
+  PDDoc pddoc;
+  AVDoc avdoc;
+public:
+  StatusMonitorUtil();
+  void SetText(std::string text);
+  void SetValue(int value);
+  void EndOperation();
+};
+
+ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder); 
+
 AVStatusMonitorProcsRec GetStatusMonitor();
 
 }  // acrobat_utils

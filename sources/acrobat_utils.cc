@@ -24,6 +24,8 @@ void MenuUtil::Init() {
       acrobat_main_menu = AVMenuNew("ReproMatic", "PTRK:ReproMatic", gExtensionID);
       AVMenubarAddMenu(app_menubar, acrobat_main_menu, APPEND_MENU);
     }
+
+    created_menus["acrobat_main_menu"] = acrobat_main_menu;
   }
 }
 
@@ -81,6 +83,70 @@ void MenuUtil::AddMenuItemToMenu(
 
   created_menu_items.push_back(menu_item);
 }  
+
+StatusMonitorUtil::StatusMonitorUtil() {
+  pddoc = PDDocCreate();
+  PDPageRelease(
+    PDDocCreatePage(pddoc, PDBeforeFirstPage, ASFixedRect{
+      fixedZero, fixedZero, fixedTen, fixedTen
+    })
+  );
+
+  avdoc = AVDocOpenFromPDDoc(pddoc, NULL);
+
+  memset(&monitor, 0, sizeof(monitor));
+  monitor.size = sizeof(monitor);
+  monitor.cancelProc = AVAppGetCancelProc(&monitor.cancelProcClientData);
+  monitor.progMon = AVAppGetDocProgressMonitor(&monitor.progMonClientData);
+  monitor.reportProc = AVAppGetReportProc(&monitor.reportProcClientData);
+
+  if (monitor.progMon) {
+    if (monitor.progMon->beginOperation) {
+      monitor.progMon->beginOperation(monitor.progMonClientData);
+    }
+
+    if (monitor.progMon->setCurrValue) {
+      monitor.progMon->setCurrValue(0, monitor.progMonClientData);
+    }
+
+    if (monitor.progMon->setDuration) {
+      monitor.progMon->setDuration(100, monitor.progMonClientData);
+    }
+  }
+}
+
+void StatusMonitorUtil::SetText(std::string text) {
+  if (monitor.progMon && monitor.progMon->setText) {
+    monitor.progMon->setText(
+      ASTextFromEncoded(text.c_str(), AVAppGetLanguageEncoding()),
+      monitor.progMonClientData
+    );
+  }
+}
+
+void StatusMonitorUtil::SetValue(int value) {
+  if (monitor.progMon && monitor.progMon->setCurrValue) {
+    monitor.progMon->setCurrValue(
+      value, monitor.progMonClientData
+    );
+  }
+}
+
+void StatusMonitorUtil::EndOperation() {
+  if (monitor.progMon && monitor.progMon->endOperation) {
+    monitor.progMon->endOperation(monitor.progMonClientData);
+  }
+
+  AVDocClose(avdoc, true);
+}
+
+ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder) {
+  AVOpenSaveDialogParamsRec params;
+  memset(&params, NULL, sizeof(AVOpenSaveDialogParamsRec));
+  params.size = sizeof(AVOpenSaveDialogParamsRec);
+
+  return AVAppChooseFolderDialog(&params, &file_system, &folder);
+};
 
 AVStatusMonitorProcsRec GetStatusMonitor() {
   AVStatusMonitorProcsRec status_monitor;

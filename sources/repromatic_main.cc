@@ -229,6 +229,125 @@ ACCB1 void ACCB2 PdfFormatSummaryDetailed(void *clientData) { Summary(true); }
 ACCB1 ASBool ACCB2 PdfFormatSummaryIsEnabled(void *clientData) { return true; }
 
 
+// Extract
+// =======
+
+void Extract(std::string extract_format) {
+  ASFileSys file_system = nullptr;
+  ASPathName folder = nullptr;
+  if (!repromatic::acrobat_utils::GetFolderByDialog(file_system, folder)) {
+    return;
+  }
+
+  repromatic::acrobat_utils::StatusMonitorUtil status_monitor;
+
+  ASPathName extracted_path = ASFileSysCreatePathWithFolderName(file_system, folder, "Extracted");
+  if (ASFileSysCreateFolder(file_system, extracted_path, true) != 0) {
+    AVAlertNote("Could not create folder.");
+    return;
+  }
+
+  int file_pdf_count = 0;
+  int folder_count = 0;
+  int extracted_pages = 0;
+
+  int total_file_count = repromatic::GetItemCount(folder, file_system, "file_pdf");
+  int current_pdf_file_iteration = 0;
+
+  auto callback = [
+    &file_pdf_count, &folder_count, &status_monitor, &current_pdf_file_iteration,
+    total_file_count, extract_format, extracted_path, &extracted_pages](
+      ASFileSys file_system,
+      ASPathName root,
+      ASPathName as_item_path,
+      std::string item_type) -> void {
+    if (item_type == "file_pdf") {
+      current_pdf_file_iteration += 1;
+      file_pdf_count += 1;
+
+      char *filename = ASFileSysDIPathFromPath(
+        file_system, as_item_path, ASFileSysAcquireParent(file_system, as_item_path)
+      );
+
+      std::string status_message(filename != nullptr ? filename : "Unknown filename");
+      status_message += " - " + std::to_string(current_pdf_file_iteration) + "/" + std::to_string(total_file_count);
+
+      ASfree(filename);
+
+      status_monitor.SetText(status_message);
+      status_monitor.SetValue(100 / total_file_count * current_pdf_file_iteration);
+
+      repromatic::PageDictionary page_dict;
+
+      PDDoc my_doc = PDDocOpen(as_item_path, file_system, NULL, false);
+      page_dict.AddPagesFrom(my_doc);
+
+      bool can_delete_pages = false;
+
+      DURING
+        int perm_request = PDDocPermRequest(my_doc, PDPermReqObjPage, PDPermReqOprDelete, nullptr);
+        can_delete_pages = perm_request == 0 ? true : false;
+      HANDLER
+      END_HANDLER
+
+      if (can_delete_pages) {
+        AVAlertNote("We are allowed to deleted pages.");
+      } else {
+        AVAlertNote("We are not allowed to delete pages.");
+      }
+
+      auto pages = page_dict.GetPages();
+      for (auto ri = pages.rbegin(); ri != pages.rend(); ++ri) {
+        if (ri->GetDinKey() != extract_format) {
+          PDDocDeletePages(
+            my_doc,
+            ri->number,
+            ri->number,
+            NULL,
+            NULL
+          );
+        }
+      }
+      extracted_pages += PDDocGetNumPages(my_doc);
+
+      ASText pdf_file_name = ASTextNew();
+      if (ASFileSysGetNameFromPathAsASText(file_system, as_item_path, pdf_file_name) != 0) {
+        AVAlertNote("Could not get filename.");
+        return;
+      }
+      ASText prefixed_name = ASTextFromEncoded((std::to_string(file_pdf_count) + "_").c_str(), AVAppGetLanguageEncoding());
+      ASTextCat(prefixed_name, pdf_file_name);
+
+      ASPathName complete_path = ASFileSysCreatePathWithFolderNameWithASText(
+        file_system,
+        extracted_path,
+        prefixed_name
+      );
+
+      PDDocSave(my_doc, PDSaveFull | PDSaveCopy | PDSaveCollectGarbage, complete_path, file_system, NULL, NULL);
+      PDDocClose(my_doc);
+    } else if (item_type == "folder") {
+      folder_count += 1;
+    }
+  };
+
+  repromatic::IterateFolder(file_system, folder, folder, callback);
+
+  status_monitor.EndOperation();
+
+  std::stringstream alert;
+  alert << "Extracted pages from `" << ASFileSysDIPathFromPath(NULL, folder, NULL) << "'." << std::endl;
+  alert << "• " << extracted_pages << " page" << (extracted_pages > 1 ? "s" : "");
+  alert << " extracted from " << file_pdf_count << " PDF file" << (file_pdf_count > 1 ? "s" : "") << "." << std::endl << std::endl;
+
+  AVAlertNote(alert.str().c_str());
+}
+
+// Summary Callbacks
+ACCB1 void ACCB2 ExtractPlans(void *clientData) { Extract("Plan"); }
+ACCB1 ASBool ACCB2 ExtractIsEnabled(void *clientData) { return true; }
+
+
 // Divider
 // =======
 

@@ -116,4 +116,8 @@ std::string PageDictionary::ToString(bool print_sizes, bool print_pages) const {
   return o.str();
 }
 
+std::vector<Page> PageDictionary::GetPages() const {
+  return pages;
+}
+
 }  // repromatic
