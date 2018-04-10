@@ -115,6 +115,12 @@ StatusMonitorUtil::StatusMonitorUtil() {
   }
 }
 
+void StatusMonitorUtil::SetDuration(int duration) {
+  if (monitor.progMon->setDuration) {
+    monitor.progMon->setDuration(duration, monitor.progMonClientData);
+  }
+}
+
 void StatusMonitorUtil::SetText(std::string text) {
   if (monitor.progMon && monitor.progMon->setText) {
     monitor.progMon->setText(

@@ -12,7 +12,7 @@
 namespace repromatic {
 namespace din {
 
-const float tolerance = ConvertPrintUnits::MmToPoint(5);
+const float tolerance = ConvertPrintUnits::MmToPoint(10);
 
 const std::map<int, Format> formats = []{
   std::map<int, Format> m;

@@ -27,6 +27,8 @@ extern ACCB1 void ACCB2 PdfFormatSummarySimple(void *clientData);  // repromatic
 extern ACCB1 void ACCB2 PdfFormatSummaryDetailed(void *clientData);  // repromatic_main.cc
 extern ACCB1 ASBool ACCB2 PdfFormatSummaryIsEnabled(void *clientData);  // repromatic_main.cc
 
+extern ACCB1 void ACCB2 ExtractA4(void *clientData);  // repromatic_main.cc
+extern ACCB1 void ACCB2 ExtractA3(void *clientData);  // repromatic_main.cc
 extern ACCB1 void ACCB2 ExtractPlans(void *clientData);  // repromatic_main.cc
 extern ACCB1 ASBool ACCB2 ExtractIsEnabled(void *clientData);  // repromatic_main.cc
 
@@ -95,6 +97,18 @@ ACCB1 ASBool ACCB2 ReproInit() {
       "PDF Format Summary", "Detailed",
       ASCallbackCreateProto(AVExecuteProc, PdfFormatSummaryDetailed),
       ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled)
+    );
+
+    MenuManager.AddMenuItemToMenu(
+      "Extract", "A4",
+      ASCallbackCreateProto(AVExecuteProc, ExtractA4),
+      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled)
+    );
+
+    MenuManager.AddMenuItemToMenu(
+      "Extract", "A3",
+      ASCallbackCreateProto(AVExecuteProc, ExtractA3),
+      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled)
     );
 
     MenuManager.AddMenuItemToMenu(

@@ -45,6 +45,7 @@ private:
   AVDoc avdoc;
 public:
   StatusMonitorUtil();
+  void SetDuration(int duration);
   void SetText(std::string text);
   void SetValue(int value);
   void EndOperation();

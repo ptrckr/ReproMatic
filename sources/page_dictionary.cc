@@ -43,6 +43,18 @@ std::string PageDictionary::GetDinKey() const {
   return key;
 }
 
+bool PageDictionary::ContainsDinKey(std::string key) const {
+  std::vector<std::string> keys;
+
+  for (const Page &page : pages) {
+    if (page.GetDinKey() == key) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 std::string PageDictionary::ToString(bool print_sizes, bool print_pages) const {
   std::map<std::string, std::map<std::string, std::vector<int>>> ordered_pages;
 
