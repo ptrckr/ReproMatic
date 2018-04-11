@@ -236,6 +236,7 @@ void Extract(std::string extract_format) {
   ASFileSys file_system = nullptr;
   ASPathName folder = nullptr;
   if (!repromatic::acrobat_utils::GetFolderByDialog(file_system, folder)) {
+    ASFileSysReleasePath(file_system, folder);
     return;
   }
 
@@ -276,24 +277,6 @@ void Extract(std::string extract_format) {
       );
       ASfree(filename);
 
-      ASPathName folder_root = ASFileSysAcquireParent(file_system, as_item_path);
-      ASPathName extracted_path = ASFileSysCreatePathWithFolderName(file_system, folder_root, "Extracted");
-      ASPathName extracted_format_path = ASFileSysCreatePathWithFolderName(file_system, extracted_path, extract_format.c_str());
-      if (ASFileSysCreateFolder(file_system, extracted_format_path, true) != 0) {
-        AVAlertNote("Could not create `Extracted' folder.");
-        return;
-      }
-
-      ASText pdf_file_name = ASTextNew();
-      if (ASFileSysGetNameFromPathAsASText(file_system, as_item_path, pdf_file_name) != 0) {
-        AVAlertNote("Could not get filename.");
-        return;
-      }
-
-      ASPathName complete_path = ASFileSysCreatePathWithFolderNameWithASText(
-        file_system, extracted_format_path, pdf_file_name
-      );
-
       PDDoc doc = PDDocOpen(as_item_path, file_system, NULL, false);
       repromatic::PageDictionary page_dict;
       page_dict.AddPagesFrom(doc);
@@ -308,6 +291,7 @@ void Extract(std::string extract_format) {
       HANDLER
       END_HANDLER
 
+      bool doc_has_extract_format = false;
       if (can_delete_pages) {
         auto pages = page_dict.GetPages();
         for (auto page = pages.rbegin(); page != pages.rend(); ++page) {
@@ -322,20 +306,42 @@ void Extract(std::string extract_format) {
 
         if (PDDocGetNumPages(doc) > 0) {
           extracted_pages_count += PDDocGetNumPages(doc);
-
-          PDDocSave(doc, PDSaveFull | PDSaveCopy | PDSaveCollectGarbage, complete_path, file_system, NULL, NULL);
+          doc_has_extract_format = true;
         }
       } else {        
         if (page_dict.ContainsDinKey(extract_format)) {
           folder_has_locked_docs = true;
-          PDDocSave(doc, PDSaveFull | PDSaveCopy | PDSaveCollectGarbage, complete_path, file_system, NULL, NULL);
+          doc_has_extract_format = true;
         }
       }
+
+      if (doc_has_extract_format) {
+        ASPathName folder_root = ASFileSysAcquireParent(file_system, as_item_path);
+        ASPathName extracted_path = ASFileSysCreatePathWithFolderName(file_system, folder_root, "Extracted");
+        ASPathName extracted_format_path = ASFileSysCreatePathWithFolderName(file_system, extracted_path, extract_format.c_str());
+        if (ASFileSysCreateFolder(file_system, extracted_format_path, true) != 0) {
+          AVAlertNote("Could not create `Extracted' folder.");
+          return;
+        }
+
+        ASText pdf_file_name = ASTextNew();
+        if (ASFileSysGetNameFromPathAsASText(file_system, as_item_path, pdf_file_name) != 0) {
+          AVAlertNote("Could not get filename.");
+          return;
+        }
+
+        ASPathName complete_path = ASFileSysCreatePathWithFolderNameWithASText(
+          file_system, extracted_format_path, pdf_file_name
+        );
+
+        PDDocSave(doc, PDSaveFull | PDSaveCopy | PDSaveCollectGarbage, complete_path, file_system, NULL, NULL);
       
-      ASFileSysReleasePath(file_system, folder_root);
-      ASFileSysReleasePath(file_system, extracted_path);
-      ASFileSysReleasePath(file_system, extracted_format_path);
-      ASFileSysReleasePath(file_system, complete_path);
+        ASFileSysReleasePath(file_system, folder_root);
+        ASFileSysReleasePath(file_system, extracted_path);
+        ASFileSysReleasePath(file_system, extracted_format_path);
+        ASFileSysReleasePath(file_system, complete_path);
+      }
+      
       PDDocClose(doc);
     } else if (item_type == "folder") {
       folder_count += 1;
@@ -368,7 +374,7 @@ void Extract(std::string extract_format) {
   );
 }
 
-// Summary Callbacks
+// Extract Callbacks
 ACCB1 void ACCB2 ExtractA4(void *clientData) { Extract("A4"); }
 ACCB1 void ACCB2 ExtractA3(void *clientData) { Extract("A3"); }
 ACCB1 void ACCB2 ExtractPlans(void *clientData) { Extract("Plan"); }

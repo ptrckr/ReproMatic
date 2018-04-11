@@ -41,7 +41,7 @@ void MenuUtil::RemoveMenuItems() {
   }
 }
 
-AVMenu MenuUtil::CreateMenu(std::string menu_name) {
+AVMenu MenuUtil::CreateMenu(std::string menu_name, std::string icon, int icon_w, int icon_h) {
   if (menu_name == "") {
     return acrobat_main_menu;
   }
@@ -54,8 +54,13 @@ AVMenu MenuUtil::CreateMenu(std::string menu_name) {
   AVMenu menu = AVMenuNew(menu_name.c_str(), (std::string("PTRK:") + menu_name).c_str(), gExtensionID);
   AVMenuItem menu_item = AVMenuItemNew(
     menu_name.c_str(),
-    (std::string("PTRK:") + menu_name + "Item").c_str(),
-    menu, true, NO_SHORTCUT, 0, NULL, gExtensionID
+    (std::string("PTRK:") + menu_name).c_str(),
+    menu, true, NO_SHORTCUT, 0,
+    (icon != "" ? (HBITMAP)LoadImage(
+      NULL, icon.c_str(),
+      IMAGE_BITMAP, icon_w, icon_h, LR_LOADFROMFILE
+    ) : NULL),
+    gExtensionID
   );
   AVMenuAddMenuItem(acrobat_main_menu, menu_item, APPEND_MENUITEM);
     
@@ -69,16 +74,30 @@ void MenuUtil::AddMenuItemToMenu(
     std::string menu,
     std::string menu_item_name,
     AVExecuteProc menu_item_callback,
-    AVComputeEnabledProc menu_item_is_enabled) {
+    AVComputeEnabledProc menu_item_is_enabled,
+    std::string icon,
+    int icon_w,
+    int icon_h) {
   AVMenu parent_menu = CreateMenu(menu);
   AVMenuItem menu_item = AVMenuItemNew(
     menu_item_name.c_str(),
     (std::string("PTRK:") + menu_item_name).c_str(),
-    NULL, true, NO_SHORTCUT, 0, NULL, gExtensionID
+    NULL, true, NO_SHORTCUT, 0, 
+    (icon != "" ? (HBITMAP)LoadImage(
+      NULL, icon.c_str(),
+      IMAGE_BITMAP, icon_w, icon_h, LR_LOADFROMFILE
+    ) : NULL),
+    gExtensionID
   );
 
-  AVMenuItemSetExecuteProc(menu_item, menu_item_callback, NULL);
-  AVMenuItemSetComputeEnabledProc(menu_item, menu_item_is_enabled, (void *)pdPermEdit);
+  if (menu_item_callback != nullptr) {
+    AVMenuItemSetExecuteProc(menu_item, menu_item_callback, NULL);
+  }
+
+  if (menu_item_is_enabled != nullptr) {
+    AVMenuItemSetComputeEnabledProc(menu_item, menu_item_is_enabled, (void *)pdPermEdit);
+  }
+
   AVMenuAddMenuItem(parent_menu, menu_item, APPEND_MENUITEM);
 
   created_menu_items.push_back(menu_item);

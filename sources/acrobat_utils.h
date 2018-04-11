@@ -29,12 +29,15 @@ public:
   void Init();
   void ReleaseMenus();
   void RemoveMenuItems();
-  AVMenu CreateMenu(std::string menu_name);
+  AVMenu CreateMenu(std::string menu_name, std::string icon = "", int iocn_w = 0, int icon_h = 0);
   void AddMenuItemToMenu(
     std::string menu,
     std::string menu_item_name,
     AVExecuteProc menu_item_callback, 
-    AVComputeEnabledProc menu_item_is_enabled
+    AVComputeEnabledProc menu_item_is_enabled,
+    std::string icon = "",
+    int icon_w = 0,
+    int icon_h = 0
   );
 };
 

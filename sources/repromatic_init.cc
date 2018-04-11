@@ -81,22 +81,38 @@ ACCB1 ASBool ACCB2 PIHandshake(Uns32 handshakeVersion, void *handshakeData) {
 
 ACCB1 ASBool ACCB2 ReproInit() {
   DURING
-    MenuManager.AddMenuItemToMenu(
-      "Sort Folder", "Recursive",
-      ASCallbackCreateProto(AVExecuteProc, SortRecursive),
-      ASCallbackCreateProto(AVComputeEnabledProc, SortRecursiveIsEnabled)
+    MenuManager.CreateMenu(
+      "PDF Format Summary",
+      R"(ReproMaticIcons\summary.bmp)", 24, 6
     );
 
     MenuManager.AddMenuItemToMenu(
       "PDF Format Summary", "Simple",
       ASCallbackCreateProto(AVExecuteProc, PdfFormatSummarySimple),
-      ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled)
+      ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled),
+      R"(ReproMaticIcons\summary.bmp)", 24, 6
     );
 
     MenuManager.AddMenuItemToMenu(
       "PDF Format Summary", "Detailed",
       ASCallbackCreateProto(AVExecuteProc, PdfFormatSummaryDetailed),
-      ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled)
+      ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled),
+      R"(ReproMaticIcons\summary_detailed.bmp)", 24, 10
+    );
+
+    MenuManager.AddMenuItemToMenu(
+      "", "-", nullptr, nullptr
+    );
+
+    MenuManager.CreateMenu(
+      "Sort Folder",
+      R"(ReproMaticIcons\sort.bmp)", 20, 16
+    );
+
+    MenuManager.AddMenuItemToMenu(
+      "Sort Folder", "Recursive",
+      ASCallbackCreateProto(AVExecuteProc, SortRecursive),
+      ASCallbackCreateProto(AVComputeEnabledProc, SortRecursiveIsEnabled)
     );
 
     MenuManager.AddMenuItemToMenu(
