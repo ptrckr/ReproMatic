@@ -7,6 +7,7 @@
 #include <string>
 #include <functional>
 #include <regex>
+#include <vector>
 
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
@@ -21,6 +22,56 @@ bool IsRectWithinBounds(float src_width, float src_height, float ref_width, floa
   }
 
   return false;
+}
+
+std::vector<std::string> QueryFolder(ASFileSys file_sys, ASFileSysItemType filter,
+                                     ASPathName root, bool recursive,
+                                     bool include_full_path, ASPathName folder) {
+  std::vector<std::string> items;
+  ASFileSysItemPropsRec props = {0};
+  ASPathName path;
+  ASFolderIterator iterator;
+  
+  folder = (folder != NULL) ? folder : root;
+  props.size = sizeof(ASFileSysItemPropsRec);
+  iterator = ASFileSysFirstFolderItem(file_sys, folder, &props, &path);
+  
+  if (iterator == NULL) return items;
+
+  std::regex is_pdf(R"(.*\.pdf$)", std::regex::icase);
+  std::regex is_internal_folder(R"(.*(Extracted|Sorted)$)", std::regex::icase);
+
+  do {
+    char* item_cstr = ASFileSysDIPathFromPath(
+      file_sys,
+      path,
+      include_full_path ? root : ASFileSysAcquireParent(file_sys, path)
+    );
+    if (item_cstr == nullptr) continue;
+    std::string item(item_cstr);
+    ASfree(item_cstr);
+
+    if (props.type == kASFileSysFile && !std::regex_match(item, is_pdf) ||
+        props.type == kASFileSysFolder && std::regex_match(item, is_internal_folder)) {
+      continue;
+    }
+
+    if (props.type == filter) {
+      items.push_back(item);
+    }
+
+    if (props.type == kASFileSysFolder && recursive) {
+      std::vector<std::string> children = QueryFolder(
+        file_sys, filter, root, recursive, include_full_path, path
+      );
+      items.insert(std::end(items), std::begin(children), std::end(children));
+    } 
+  } while (ASFileSysNextFolderItem(file_sys, iterator, &props, &path));
+  
+  ASFileSysReleasePath(file_sys, folder);
+  ASFileSysDestroyFolderIterator(file_sys, iterator);
+  
+  return items;
 }
 
 void IterateFolder(

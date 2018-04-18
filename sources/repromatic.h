@@ -8,6 +8,7 @@
 
 #include <string>
 #include <functional>
+#include <vector>
 
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
@@ -22,6 +23,10 @@ bool IsRectWithinBounds(
   float ref_height,
   float tolerance
 );
+
+std::vector<std::string> QueryFolder(ASFileSys file_sys, ASFileSysItemType filter,
+                                     ASPathName root, bool recursive, bool include_full_path = false,
+                                     ASPathName folder = NULL);
 
 void IterateFolder(
   ASFileSys file_system,
