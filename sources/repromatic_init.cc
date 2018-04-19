@@ -101,6 +101,12 @@ ACCB1 ASBool ACCB2 ReproInit() {
     );
 
     MenuManager.AddMenuItemToMenu(
+      "", "Create Divider",
+      ASCallbackCreateProto(AVExecuteProc, Divider),
+      ASCallbackCreateProto(AVComputeEnabledProc, DividerIsEnabled)
+    );
+
+    MenuManager.AddMenuItemToMenu(
       "", "-", nullptr, nullptr
     );
 
@@ -131,12 +137,6 @@ ACCB1 ASBool ACCB2 ReproInit() {
       "Extract", "Plans",
       ASCallbackCreateProto(AVExecuteProc, ExtractPlans),
       ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled)
-    );
-
-    MenuManager.AddMenuItemToMenu(
-      "Test", "Create Divider",
-      ASCallbackCreateProto(AVExecuteProc, Divider),
-      ASCallbackCreateProto(AVComputeEnabledProc, DividerIsEnabled)
     );
 
     MenuManager.ReleaseMenus();

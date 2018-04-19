@@ -24,9 +24,12 @@ bool IsRectWithinBounds(
   float tolerance
 );
 
-std::vector<std::string> QueryFolder(ASFileSys file_sys, ASFileSysItemType filter,
-                                     ASPathName root, bool recursive, bool include_full_path = false,
-                                     ASPathName folder = NULL);
+std::vector<std::string> QueryFolder(
+  ASFileSys file_sys,
+  ASFileSysItemType filter,
+  ASPathName root, bool recursive = false,
+  ASPathName folder = nullptr
+);
 
 void IterateFolder(
   ASFileSys file_system,

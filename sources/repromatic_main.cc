@@ -7,7 +7,6 @@
 #include <sstream>
 #include <cstdio>
 #include <vector>
-#include <algorithm>  // sort
 
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
@@ -404,17 +403,16 @@ ACCB1 ASBool ACCB2 find_font(PDSysFont sys_font, void *font_attrs) {
 
 void CreateDivider() {
   // Get root folder
-  ASFileSys file_system = nullptr;
+  ASFileSys file_sys = nullptr;
   ASPathName root = nullptr;
-  if (!repromatic::acrobat_utils::GetFolderByDialog(file_system, root)) {
-    ASFileSysReleasePath(file_system, root);
+  if (!repromatic::acrobat_utils::GetFolderByDialog(file_sys, root)) {
+    ASFileSysReleasePath(file_sys, root);
     return;
   }
 
   // Get sub folders
   std::vector<std::string> folders;
-  folders = repromatic::QueryFolder(file_system, kASFileSysFolder, root, true);
-  std::sort(folders.begin(), folders.end());
+  folders = repromatic::QueryFolder(file_sys, kASFileSysFolder, root, true);
 
   repromatic::acrobat_utils::StatusMonitorUtil status_monitor;
   status_monitor.SetDuration(int(folders.size()));
@@ -428,8 +426,19 @@ void CreateDivider() {
 
   // Fill doc with pages
   for (const std::string& folder : folders) {
+    ASPathName as_folder_path = ASFileSysPathFromDIPath(file_sys, folder.c_str(), 0);
+    ASPathName as_folder_path_parent = ASFileSysAcquireParent(file_sys, as_folder_path);
+    char* folder_path_cstr = ASFileSysDIPathFromPath(file_sys, as_folder_path_parent, root);
+    char* folder_name_cstr = ASFileSysDIPathFromPath(file_sys, as_folder_path, as_folder_path_parent);
+    ASFileSysReleasePath(file_sys, as_folder_path_parent);
+    ASFileSysReleasePath(file_sys, as_folder_path);
+    std::string folder_path(folder_path_cstr);
+    std::string folder_name(folder_name_cstr);
+    ASfree(folder_path_cstr);
+    ASfree(folder_name_cstr);
+
     status_monitor.SetValue(iteration++);
-    status_monitor.SetText(std::string("[[") + folder + "]] @ " +
+    status_monitor.SetText(std::string("[[") + folder_name + "]] @ " +
                            std::to_string(iteration) + "/" +
                            std::to_string(folders.size()));
 
@@ -465,7 +474,7 @@ void CreateDivider() {
     ); 
 
     PDEColorValue fill_clr_value = {0};
-    fill_clr_value.color[3] = ASFloatToFixed(1.0);
+    fill_clr_value.color[3] = ASFloatToFixed(1.0f);
     fill_clr_spec.value = fill_clr_value;
 
     graphic_state.fillColorSpec = fill_clr_spec;
@@ -489,7 +498,7 @@ void CreateDivider() {
 
     PDETextAdd( 
       text, kPDETextRun, 0, 
-      (ASUns8P)folder.c_str(), folder.length(), 
+      (ASUns8P)folder_name.c_str(), folder_name.length(), 
       font, 
       &graphic_state, sizeof(graphic_state), 
       &text_state, sizeof(text_state), 
@@ -506,6 +515,28 @@ void CreateDivider() {
     );
     PDETextRunSetTextMatrix(text, 0, &new_matrix);
 
+    graphic_state.fillColorSpec.value.color[3] = ASFloatToFixed(0.5f);
+    text_matrix.a = ASInt32ToFixed(7);
+    text_matrix.d = ASInt32ToFixed(7);
+
+    PDETextAdd( 
+      text, kPDETextRun, 0, 
+      (ASUns8P)folder_path.c_str(), folder_path.length(), 
+      font, 
+      &graphic_state, sizeof(graphic_state), 
+      &text_state, sizeof(text_state), 
+      &text_matrix, NULL 
+    );
+
+    PDETextGetQuad(text, kPDETextRun, 0, &quad);
+    PDETextGetTextMatrix(text, kPDETextRun, 0, &new_matrix);
+    new_matrix.h = ASFixedDiv(
+      ASFloatToFixed(repromatic::ConvertPrintUnits::MmToPoint(page_width)) - quad.tr.h,
+      ASInt32ToFixed(2)
+    );
+    new_matrix.v = new_matrix.v + (quad.tl.v - quad.bl.v);
+    PDETextRunSetTextMatrix(text, 0, &new_matrix);
+
     PDEContent content = PDPageAcquirePDEContent(page, gExtensionID); 
     PDEContentAddElem(content, kPDEAfterLast, PDEElement(text));
     PDPageSetPDEContent(page, gExtensionID);
@@ -518,11 +549,25 @@ void CreateDivider() {
   status_monitor.EndOperation();
 
   // Free resources
-  ASFileSysReleasePath(file_system, root);
+  ASFileSysReleasePath(file_sys, root);
 
   // Display doc
   if (PDDocGetNumPages(pddoc) > 0) {
-    AVDoc avdoc = AVDocOpenFromPDDoc(pddoc, NULL);
+    /*AVDocOpenParams params{0};
+    params->size = sizeof(AVDocOpenParamsRec);
+    params->useViewDef = true;
+
+    AVDocViewDef view_def{0};
+    view_def->size = sizeof(AVDocViewDef);
+    view_def->pageViewZoomType = AVZoomFitPage;
+
+    params->viewDef = view_def;*/
+
+    AVDoc avdoc = AVDocOpenFromPDDocWithParamString(
+      pddoc,
+      ASTextFromEncoded("Divider", AVAppGetLanguageEncoding()),
+      NULL,
+      "page=2&view=fit,100");
   } else {
     PDDocClose(pddoc);
     AVAlertNote("No folders found.");
