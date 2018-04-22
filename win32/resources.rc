@@ -1,0 +1,9 @@
+#include "resources.h"
+
+IDB_DEFAULT PNG "../resources/default.png"
+IDB_SUMMARY PNG "../resources/summary.png"
+IDB_SUMMARY_SIMPLE PNG "../resources/summary_simple.png"
+IDB_DIVIDER PNG "../resources/divider.png"
+IDB_EXTRACT PNG "../resources/extract.png"
+IDB_SORT PNG "../resources/sort_folder.png"
+IDB_SORT_RECURSIVE PNG "../resources/sort_folder_recursive.png"

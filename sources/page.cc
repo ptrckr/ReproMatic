@@ -13,7 +13,7 @@
   #include "PIHeaders.h"
 #endif
 
-#include "repromatic.h"
+#include "repromatic_utils.h"
 #include "convert_print_units.h"
 #include "din.h"
 

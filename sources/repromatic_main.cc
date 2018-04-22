@@ -12,7 +12,7 @@
   #include "PIHeaders.h"
 #endif
 
-#include "repromatic.h"
+#include "repromatic_utils.h"
 #include "acrobat_utils.h"
 #include "page_dictionary.h"
 

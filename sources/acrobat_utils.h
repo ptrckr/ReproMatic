@@ -14,6 +14,8 @@
 #include "PIHeaders.h"
 #endif
 
+#include "resources.h"
+
 namespace repromatic {
 namespace acrobat_utils {
 
@@ -29,15 +31,13 @@ public:
   void Init();
   void ReleaseMenus();
   void RemoveMenuItems();
-  AVMenu CreateMenu(std::string menu_name, std::string icon = "", int iocn_w = 0, int icon_h = 0);
+  AVMenu CreateMenu(std::string menu_name, int resource_id = IDB_DEFAULT);
   void AddMenuItemToMenu(
     std::string menu,
     std::string menu_item_name,
     AVExecuteProc menu_item_callback, 
     AVComputeEnabledProc menu_item_is_enabled,
-    std::string icon = "",
-    int icon_w = 0,
-    int icon_h = 0
+    int resource_id = IDB_DEFAULT
   );
 };
 
@@ -57,6 +57,8 @@ public:
 ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder); 
 
 AVStatusMonitorProcsRec GetStatusMonitor();
+
+AVIconBundle6 GetIconByResourceId(int resource_id);
 
 }  // acrobat_utils
 }  // repromatic

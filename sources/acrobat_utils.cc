@@ -8,10 +8,17 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <exception>
 
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
 #endif
+
+#include "resources.h"
+
+#if WIN_PLATFORM 
+extern "C" HINSTANCE gHINSTANCE;
+#endif 
 
 namespace repromatic {
 namespace acrobat_utils {
@@ -41,7 +48,7 @@ void MenuUtil::RemoveMenuItems() {
   }
 }
 
-AVMenu MenuUtil::CreateMenu(std::string menu_name, std::string icon, int icon_w, int icon_h) {
+AVMenu MenuUtil::CreateMenu(std::string menu_name, int resource_id) {
   if (menu_name == "") {
     return acrobat_main_menu;
   }
@@ -56,10 +63,7 @@ AVMenu MenuUtil::CreateMenu(std::string menu_name, std::string icon, int icon_w,
     menu_name.c_str(),
     (std::string("PTRK:") + menu_name).c_str(),
     menu, true, NO_SHORTCUT, 0,
-    (icon != "" ? (HBITMAP)LoadImage(
-      NULL, icon.c_str(),
-      IMAGE_BITMAP, icon_w, icon_h, LR_LOADFROMFILE
-    ) : NULL),
+    repromatic::acrobat_utils::GetIconByResourceId(resource_id),
     gExtensionID
   );
   AVMenuAddMenuItem(acrobat_main_menu, menu_item, APPEND_MENUITEM);
@@ -75,18 +79,13 @@ void MenuUtil::AddMenuItemToMenu(
     std::string menu_item_name,
     AVExecuteProc menu_item_callback,
     AVComputeEnabledProc menu_item_is_enabled,
-    std::string icon,
-    int icon_w,
-    int icon_h) {
+    int resource_id) {
   AVMenu parent_menu = CreateMenu(menu);
   AVMenuItem menu_item = AVMenuItemNew(
     menu_item_name.c_str(),
     (std::string("PTRK:") + menu_item_name).c_str(),
     NULL, true, NO_SHORTCUT, 0, 
-    (icon != "" ? (HBITMAP)LoadImage(
-      NULL, icon.c_str(),
-      IMAGE_BITMAP, icon_w, icon_h, LR_LOADFROMFILE
-    ) : NULL),
+    repromatic::acrobat_utils::GetIconByResourceId(resource_id),
     gExtensionID
   );
 
@@ -95,7 +94,7 @@ void MenuUtil::AddMenuItemToMenu(
   }
 
   if (menu_item_is_enabled != nullptr) {
-    AVMenuItemSetComputeEnabledProc(menu_item, menu_item_is_enabled, (void *)pdPermEdit);
+    AVMenuItemSetComputeEnabledProc(menu_item, menu_item_is_enabled, (void*)pdPermEdit);
   }
 
   AVMenuAddMenuItem(parent_menu, menu_item, APPEND_MENUITEM);
@@ -196,6 +195,30 @@ AVStatusMonitorProcsRec GetStatusMonitor() {
   }
 
   return status_monitor;
+}
+
+AVIconBundle6 GetIconByResourceId(int resource_id) {
+  HRSRC resource = FindResource(gHINSTANCE,
+                                MAKEINTRESOURCE(resource_id),
+                                "PNG");
+
+  if(resource == NULL) {
+    throw std::runtime_error("Resource could not be found.");
+  }
+
+  DWORD resourceSize = SizeofResource(gHINSTANCE, resource);
+  HGLOBAL glob = LoadResource(gHINSTANCE, resource);
+  LPVOID resouceArray = LockResource(glob);
+  ASUns8* data = (ASUns8*)ASmalloc(resourceSize + 1);
+  memcpy(data, resouceArray, resourceSize);
+
+  AVIconDataRec iconData;
+  iconData.dataStm = ASMemStmRdOpen((char*)data, resourceSize);
+  iconData.eColorFormat = kAVIconColor;
+
+  AVIconBundle6 iconBundle = AVAppCreateIconBundle6(kAVIconPNG, &iconData, 1);
+
+  return iconBundle;
 }
 
 }  // acrobat_utils

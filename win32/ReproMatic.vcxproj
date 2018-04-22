@@ -63,16 +63,22 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <ResourceOutputFileName>$(IntDir)%(Filename).res</ResourceOutputFileName>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/EXPORT:PlugInMain %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <OutputFile>build/ReproMatic.api</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/ReproMatic.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>.\Debug/ReproMatic.lib</ImportLibrary>
+      <EmbedManagedResourceFile>
+      </EmbedManagedResourceFile>
     </Link>
     <PostBuildEvent>
       <Message>Copy to Acrobat Plug-ins...</Message>
@@ -92,7 +98,7 @@ if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not se
     <ClCompile Include="..\sources\din.cc" />
     <ClCompile Include="..\sources\page.cc" />
     <ClCompile Include="..\sources\page_dictionary.cc" />
-    <ClCompile Include="..\sources\repromatic.cc" />
+    <ClCompile Include="..\sources\repromatic_utils.cc" />
     <ClCompile Include="..\sources\repromatic_main.cc">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -113,7 +119,11 @@ if "%SDKPIDir%"a == ""a echo not performed. SDKPIDir environment variable not se
     <ClInclude Include="..\sources\din.h" />
     <ClInclude Include="..\sources\page.h" />
     <ClInclude Include="..\sources\page_dictionary.h" />
-    <ClInclude Include="..\sources\repromatic.h" />
+    <ClInclude Include="..\sources\repromatic_utils.h" />
+    <ClInclude Include="resources.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

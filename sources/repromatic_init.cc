@@ -11,6 +11,7 @@
 #endif
 
 #include "acrobat_utils.h"
+#include "resources.h"
 
 // Menu Manager
 // ============
@@ -81,62 +82,67 @@ ACCB1 ASBool ACCB2 PIHandshake(Uns32 handshakeVersion, void *handshakeData) {
 
 ACCB1 ASBool ACCB2 ReproInit() {
   DURING
-    MenuManager.CreateMenu(
-      "PDF Format Summary",
-      R"(ReproMaticIcons\summary.bmp)", 24, 6
-    );
+    // Summary
+    // =======
+    MenuManager.CreateMenu("PDF Format Summary", IDB_SUMMARY);
 
     MenuManager.AddMenuItemToMenu(
       "PDF Format Summary", "Simple",
       ASCallbackCreateProto(AVExecuteProc, PdfFormatSummarySimple),
       ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled),
-      R"(ReproMaticIcons\summary.bmp)", 24, 6
+      IDB_SUMMARY_SIMPLE
     );
 
     MenuManager.AddMenuItemToMenu(
       "PDF Format Summary", "Detailed",
       ASCallbackCreateProto(AVExecuteProc, PdfFormatSummaryDetailed),
       ASCallbackCreateProto(AVComputeEnabledProc, PdfFormatSummaryIsEnabled),
-      R"(ReproMaticIcons\summary_detailed.bmp)", 24, 10
+      IDB_SUMMARY
     );
 
     MenuManager.AddMenuItemToMenu(
       "", "Create Divider",
       ASCallbackCreateProto(AVExecuteProc, Divider),
-      ASCallbackCreateProto(AVComputeEnabledProc, DividerIsEnabled)
+      ASCallbackCreateProto(AVComputeEnabledProc, DividerIsEnabled),
+      IDB_DIVIDER
     );
 
-    MenuManager.AddMenuItemToMenu(
-      "", "-", nullptr, nullptr
-    );
+    MenuManager.AddMenuItemToMenu("", "-", nullptr, nullptr);
 
-    MenuManager.CreateMenu(
-      "Sort Folder",
-      R"(ReproMaticIcons\sort.bmp)", 20, 16
-    );
+    // Sort
+    // ====
+    MenuManager.CreateMenu("Sort Folder", IDB_SORT);
 
     MenuManager.AddMenuItemToMenu(
       "Sort Folder", "Recursive",
       ASCallbackCreateProto(AVExecuteProc, SortRecursive),
-      ASCallbackCreateProto(AVComputeEnabledProc, SortRecursiveIsEnabled)
+      ASCallbackCreateProto(AVComputeEnabledProc, SortRecursiveIsEnabled),
+      IDB_SORT_RECURSIVE
     );
+
+    // Extract
+    // =======
+    MenuManager.CreateMenu("Extract", IDB_EXTRACT);
 
     MenuManager.AddMenuItemToMenu(
       "Extract", "DIN A4",
       ASCallbackCreateProto(AVExecuteProc, ExtractA4),
-      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled)
+      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled),
+      IDB_EXTRACT
     );
 
     MenuManager.AddMenuItemToMenu(
       "Extract", "DIN A3",
       ASCallbackCreateProto(AVExecuteProc, ExtractA3),
-      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled)
+      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled),
+      IDB_EXTRACT
     );
 
     MenuManager.AddMenuItemToMenu(
       "Extract", "Plans",
       ASCallbackCreateProto(AVExecuteProc, ExtractPlans),
-      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled)
+      ASCallbackCreateProto(AVComputeEnabledProc, ExtractIsEnabled),
+      IDB_EXTRACT
     );
 
     MenuManager.ReleaseMenus();
