@@ -1,21 +1,21 @@
-﻿//	
+﻿//
 //  repromatic_main.cc
-//  Created by ptrckr on 28.02.18.	
-//	
+//  Created by Patrick Rügheimer on 28.02.18.
+//
 
 #include <string>
 #include <sstream>
 #include <cstdio>
 #include <vector>
-
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
 #endif
+//#include "repromatic_utils.h"
+//#include "acrobat_utils.h"
+//#include "page_dictionary.h"
+//#include "dictionaries/scan_dictionary.h"
 
-#include "repromatic_utils.h"
-#include "acrobat_utils.h"
-#include "page_dictionary.h"
-
+/*
 // Sort
 // ====
 
@@ -230,6 +230,54 @@ ACCB1 void ACCB2 PdfFormatSummaryDetailed(void *clientData) { Summary(true); }
 ACCB1 ASBool ACCB2 PdfFormatSummaryIsEnabled(void *clientData) { return true; }
 
 
+// Summary Plan Scans
+// ==================
+
+void SummaryPlanScans() {
+  repromatic::ScanDictionary scan_dict;
+
+  // Get root folder
+  ASFileSys file_sys = nullptr;
+  ASPathName folder = nullptr;
+  if (!repromatic::acrobat_utils::GetFolderByDialog(file_sys, folder)) {
+    ASFileSysReleasePath(file_sys, folder);
+    return;
+  }
+
+  // Get files
+  std::vector<std::string> files;
+  files = repromatic::QueryFolder(file_sys, kASFileSysFile, folder, true);
+
+  // Setup Status Monitor
+  repromatic::acrobat_utils::StatusMonitorUtil status_monitor;
+  status_monitor.SetDuration(static_cast<int>(files.size()));
+
+  // Alert
+  for (std::string const file : files) {
+    ASPathName as_file = ASFileSysPathFromDIPath(file_sys, file.c_str(), 0);
+    PDDoc my_doc = PDDocOpen(as_file, file_sys, NULL, false);
+    ASFileSysReleasePath(file_sys, as_file);
+    scan_dict.AddPagesFrom(my_doc);
+    PDDocClose(my_doc);
+  };
+
+  std::stringstream alert;
+
+  char *root_folder_path = ASFileSysDIPathFromPath(NULL, folder, NULL);
+  ASFileSysReleasePath(file_sys, folder);
+  alert << "[[" << root_folder_path << "]]";
+  ASfree(root_folder_path);
+
+  alert << std::endl << std::endl;
+  alert << scan_dict.Stringify();
+
+  AVAlertNote(alert.str().c_str());
+}
+
+// Summary Plan Scans Callbacks
+ACCB1 void ACCB2 PdfFormatSummaryPlanScans(void *clientData) { SummaryPlanScans(); }
+
+
 // Extract
 // =======
 
@@ -309,7 +357,7 @@ void Extract(std::string extract_format) {
           extracted_pages_count += PDDocGetNumPages(doc);
           doc_has_extract_format = true;
         }
-      } else {        
+      } else {
         if (page_dict.ContainsDinKey(extract_format)) {
           folder_has_locked_docs = true;
           doc_has_extract_format = true;
@@ -336,13 +384,13 @@ void Extract(std::string extract_format) {
         );
 
         PDDocSave(doc, PDSaveFull | PDSaveCopy | PDSaveCollectGarbage, complete_path, file_system, NULL, NULL);
-      
+
         ASFileSysReleasePath(file_system, folder_root);
         ASFileSysReleasePath(file_system, extracted_path);
         ASFileSysReleasePath(file_system, extracted_format_path);
         ASFileSysReleasePath(file_system, complete_path);
       }
-      
+
       PDDocClose(doc);
     } else if (item_type == "folder") {
       folder_count += 1;
@@ -448,7 +496,7 @@ void CreateDivider() {
       ASInt32ToFixed(repromatic::ConvertPrintUnits::MmToPoint(page_height))
     });
 
-    PDEText text = PDETextCreate(); 
+    PDEText text = PDETextCreate();
 
     // Font
     PDEFontAttrs font_attrs = {0};
@@ -466,12 +514,12 @@ void CreateDivider() {
 
     // Graphic State
     PDEGraphicState graphic_state = {0};
-    PDEDefaultGState(&graphic_state, sizeof(graphic_state)); 
+    PDEDefaultGState(&graphic_state, sizeof(graphic_state));
 
     PDEColorSpec fill_clr_spec = {0};
     fill_clr_spec.space = PDEColorSpaceCreateFromName(
       ASAtomFromString("DeviceCMYK")
-    ); 
+    );
 
     PDEColorValue fill_clr_value = {0};
     fill_clr_value.color[3] = ASFloatToFixed(1.0f);
@@ -489,20 +537,20 @@ void CreateDivider() {
     text_state.hScale = ASFloatToFixed(100.0);
     text_state.textRise= ASFloatToFixed(0.0);
 
-    // Text Matrix  
+    // Text Matrix
     ASFixedMatrix text_matrix = {0};
     text_matrix.a = ASInt32ToFixed(11);
     text_matrix.d = ASInt32ToFixed(11);
     text_matrix.h = FloatToASFixed(0.0);
     text_matrix.v = FloatToASFixed(repromatic::ConvertPrintUnits::MmToPoint(10.0));
 
-    PDETextAdd( 
-      text, kPDETextRun, 0, 
-      (ASUns8P)folder_name.c_str(), folder_name.length(), 
-      font, 
-      &graphic_state, sizeof(graphic_state), 
-      &text_state, sizeof(text_state), 
-      &text_matrix, NULL 
+    PDETextAdd(
+      text, kPDETextRun, 0,
+      (ASUns8P)folder_name.c_str(), folder_name.length(),
+      font,
+      &graphic_state, sizeof(graphic_state),
+      &text_state, sizeof(text_state),
+      &text_matrix, NULL
     );
 
     ASFixedQuad quad = {0};
@@ -519,13 +567,13 @@ void CreateDivider() {
     text_matrix.a = ASInt32ToFixed(7);
     text_matrix.d = ASInt32ToFixed(7);
 
-    PDETextAdd( 
-      text, kPDETextRun, 0, 
-      (ASUns8P)folder_path.c_str(), folder_path.length(), 
-      font, 
-      &graphic_state, sizeof(graphic_state), 
-      &text_state, sizeof(text_state), 
-      &text_matrix, NULL 
+    PDETextAdd(
+      text, kPDETextRun, 0,
+      (ASUns8P)folder_path.c_str(), folder_path.length(),
+      font,
+      &graphic_state, sizeof(graphic_state),
+      &text_state, sizeof(text_state),
+      &text_matrix, NULL
     );
 
     PDETextGetQuad(text, kPDETextRun, 0, &quad);
@@ -537,7 +585,7 @@ void CreateDivider() {
     new_matrix.v = new_matrix.v + (quad.tl.v - quad.bl.v);
     PDETextRunSetTextMatrix(text, 0, &new_matrix);
 
-    PDEContent content = PDPageAcquirePDEContent(page, gExtensionID); 
+    PDEContent content = PDPageAcquirePDEContent(page, gExtensionID);
     PDEContentAddElem(content, kPDEAfterLast, PDEElement(text));
     PDPageSetPDEContent(page, gExtensionID);
     PDPageNotifyContentsDidChange(page);
@@ -553,21 +601,21 @@ void CreateDivider() {
 
   // Display doc
   if (PDDocGetNumPages(pddoc) > 0) {
-    /*AVDocOpenParams params{0};
-    params->size = sizeof(AVDocOpenParamsRec);
-    params->useViewDef = true;
-
-    AVDocViewDef view_def{0};
-    view_def->size = sizeof(AVDocViewDef);
-    view_def->pageViewZoomType = AVZoomFitPage;
-
-    params->viewDef = view_def;*/
+    // AVDocOpenParams params{0};
+    // params->size = sizeof(AVDocOpenParamsRec);
+    // params->useViewDef = true;
+    //
+    // AVDocViewDef view_def{0};
+    // view_def->size = sizeof(AVDocViewDef);
+    // view_def->pageViewZoomType = AVZoomFitPage;
+    //
+    // params->viewDef = view_def;
 
     AVDoc avdoc = AVDocOpenFromPDDocWithParamString(
       pddoc,
       ASTextFromEncoded("Divider", AVAppGetLanguageEncoding()),
       NULL,
-      "page=2&view=fit,100");
+      "page=1&view=fit,100");
   } else {
     PDDocClose(pddoc);
     AVAlertNote("No folders found.");
@@ -577,3 +625,4 @@ void CreateDivider() {
 // Divider Callbacks
 ACCB1 ASBool ACCB2 DividerIsEnabled(void *clientData) { return true; }
 ACCB1 void ACCB2 Divider(void *clientData) { CreateDivider(); }
+*/

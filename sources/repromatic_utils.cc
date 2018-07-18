@@ -1,7 +1,7 @@
-//	
+//
 //  repromatic.cc
-//  Created by ptrckr on 24.03.18.	
-//	
+//  Created by ptrckr on 24.03.18.
+//
 
 #include "repromatic_utils.h"
 #include <string>
@@ -9,9 +9,8 @@
 #include <regex>
 #include <vector>
 #include <algorithm>  // sort
-
 #ifndef MAC_PLATFORM
-#include "PIHeaders.h"
+  #include "PIHeaders.h"
 #endif
 
 namespace repromatic {
@@ -33,11 +32,11 @@ std::vector<std::string> QueryFolder(ASFileSys file_sys,
   ASFileSysItemPropsRec props{0};
   ASPathName path;
   ASFolderIterator iterator;
-  
+
   folder = (folder != nullptr) ? folder : ASFileSysCopyPath(file_sys, root);
   props.size = sizeof(ASFileSysItemPropsRec);
   iterator = ASFileSysFirstFolderItem(file_sys, folder, &props, &path);
-  
+
   if (iterator == 0) return items;
 
   std::regex is_pdf(R"(.*\.pdf$)", std::regex::icase);
@@ -69,14 +68,14 @@ std::vector<std::string> QueryFolder(ASFileSys file_sys,
       std::vector<std::string> children = QueryFolder(file_sys, filter, root,
                                                       recursive, path);
       items.insert(std::end(items), std::begin(children), std::end(children));
-    } 
+    }
   } while (ASFileSysNextFolderItem(file_sys, iterator, &props, &path));
-  
+
   if (root == folder) std::sort(std::begin(items), std::end(items));
 
   ASFileSysReleasePath(file_sys, folder);
   ASFileSysDestroyFolderIterator(file_sys, iterator);
-  
+
   return items;
 }
 

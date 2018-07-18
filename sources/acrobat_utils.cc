@@ -1,34 +1,33 @@
-//	
+//
 //  acrobat_utils.cc
-//  Created by ptrckr on 24.03.18.	
-//	
+//  Created by Patrick Rügheimer on 24.03.18.
+//
 
 #include "acrobat_utils.h"
-
 #include <vector>
 #include <map>
 #include <string>
 #include <exception>
-
+#include "resources.h"
 #ifndef MAC_PLATFORM
-#include "PIHeaders.h"
+  #include "PIHeaders.h"
 #endif
 
-#include "resources.h"
-
-#if WIN_PLATFORM 
-extern "C" HINSTANCE gHINSTANCE;
-#endif 
+#if WIN_PLATFORM
+  extern "C" {
+    HINSTANCE gHINSTANCE;
+  }
+#endif
 
 namespace repromatic {
 namespace acrobat_utils {
 
 void MenuUtil::Init() {
   if (app_menubar = AVAppGetMenubar()) {
-    acrobat_main_menu = AVMenubarAcquireMenuByName(app_menubar, "PTRK:ReproMatic");
+    acrobat_main_menu = AVMenubarAcquireMenuByName(app_menubar, "PTRK:Repromatic2");
 
     if (!acrobat_main_menu) {
-      acrobat_main_menu = AVMenuNew("ReproMatic", "PTRK:ReproMatic", gExtensionID);
+      acrobat_main_menu = AVMenuNew("Repromatic 2", "PTRK:Repromatic2", gExtensionID);
       AVMenubarAddMenu(app_menubar, acrobat_main_menu, APPEND_MENU);
     }
 
@@ -67,7 +66,7 @@ AVMenu MenuUtil::CreateMenu(std::string menu_name, int resource_id) {
     gExtensionID
   );
   AVMenuAddMenuItem(acrobat_main_menu, menu_item, APPEND_MENUITEM);
-    
+
   created_menus[menu_name] = menu;
   created_menu_items.push_back(menu_item);
 
@@ -84,7 +83,7 @@ void MenuUtil::AddMenuItemToMenu(
   AVMenuItem menu_item = AVMenuItemNew(
     menu_item_name.c_str(),
     (std::string("PTRK:") + menu_item_name).c_str(),
-    NULL, true, NO_SHORTCUT, 0, 
+    NULL, true, NO_SHORTCUT, 0,
     repromatic::acrobat_utils::GetIconByResourceId(resource_id),
     gExtensionID
   );
@@ -100,7 +99,7 @@ void MenuUtil::AddMenuItemToMenu(
   AVMenuAddMenuItem(parent_menu, menu_item, APPEND_MENUITEM);
 
   created_menu_items.push_back(menu_item);
-}  
+}
 
 StatusMonitorUtil::StatusMonitorUtil() {
   pddoc = PDDocCreate();
@@ -198,9 +197,7 @@ AVStatusMonitorProcsRec GetStatusMonitor() {
 }
 
 AVIconBundle6 GetIconByResourceId(int resource_id) {
-  HRSRC resource = FindResource(gHINSTANCE,
-                                MAKEINTRESOURCE(resource_id),
-                                "PNG");
+  HRSRC resource = FindResource(gHINSTANCE, MAKEINTRESOURCE(resource_id), "PNG");
 
   if(resource == NULL) {
     throw std::runtime_error("Resource could not be found.");

@@ -1,25 +1,24 @@
-//	
-//  page.cc
-//  Created by ptrckr on 24.03.18.	
-//	
+//
+//  pages/page.cc
+//  Created by ptrckr on 24.03.18.
+//
 
-#include "page.h"
+#include "pages/page.h"
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include <iomanip>
-
+#include <iomanip>  // std::setprecision
+#include <ios>  // std::fixed
+#include "repromatic_utils.h"
+#include "convert_print_units.h"
+#include "din.h"
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
 #endif
 
-#include "repromatic_utils.h"
-#include "convert_print_units.h"
-#include "din.h"
-
 namespace repromatic {
 
-Page::Page(PDPage pd_page, int number) : number(number) {
+Page::Page(PDPage pd_page, int num) : number(num) {
   PDRotate rotated_by = PDPageGetRotate(pd_page);
 
   ASFixedRect cropbox;
@@ -78,28 +77,32 @@ Page::Page(PDPage pd_page, int number) : number(number) {
   }
 }
 
-std::string Page::GetDinKey() const {
-  if (format.fits_in_din_size != -1 && format.fits_in_din_size >= 3) {
-    return std::string("A") + std::to_string(format.fits_in_din_size);
-  } else {
-    return "Plan";
-  }
-}
-
-std::string Page::GetSizeKey() const {
-  std::stringstream size_key;
-
-  size_key << std::fixed << std::setprecision(0);
-  size_key << ConvertPrintUnits::PointToMm(format.width);
-  size_key << " × ";
-  size_key << ConvertPrintUnits::PointToMm(format.height);
-  size_key << " mm";
-
-  return size_key.str();
-}
-
 int Page::GetDisplayPageNumber() const {
   return number + 1;
+}
+
+std::string Page::GetKey() const {
+  return "TODO";
+}
+
+std::string Page::GetSize() const {
+  std::stringstream page_size;
+
+  page_size << std::fixed << std::setprecision(0);
+  page_size << ConvertPrintUnits::PointToMm(format.width);
+  page_size << " x ";
+  page_size << ConvertPrintUnits::PointToMm(format.height);
+  page_size << " mm";
+
+  return page_size.str();
+}
+
+float Page::GetSpecificWidth() const {
+  return format.width;
+}
+
+float Page::GetSpecificHeight() const {
+  return format.height;
 }
 
 }  // repromatic

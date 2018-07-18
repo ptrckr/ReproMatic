@@ -1,7 +1,7 @@
-//	
+//
 //  acrobat_utils.h
-//  Created by ptrckr on 24.03.18.	
-//	
+//  Created by Patrick Rügheimer on 24.03.18.
+//
 
 #ifndef REPROMATIC_ACROBAT_UTILS_H
 #define REPROMATIC_ACROBAT_UTILS_H
@@ -9,12 +9,10 @@
 #include <vector>
 #include <map>
 #include <string>
-
-#ifndef MAC_PLATFORM
-#include "PIHeaders.h"
-#endif
-
 #include "resources.h"
+#ifndef MAC_PLATFORM
+  #include "PIHeaders.h"
+#endif
 
 namespace repromatic {
 namespace acrobat_utils {
@@ -35,7 +33,7 @@ public:
   void AddMenuItemToMenu(
     std::string menu,
     std::string menu_item_name,
-    AVExecuteProc menu_item_callback, 
+    AVExecuteProc menu_item_callback,
     AVComputeEnabledProc menu_item_is_enabled,
     int resource_id = IDB_DEFAULT
   );
@@ -54,7 +52,7 @@ public:
   void EndOperation();
 };
 
-ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder); 
+ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder);
 
 AVStatusMonitorProcsRec GetStatusMonitor();
 

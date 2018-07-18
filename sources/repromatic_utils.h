@@ -1,7 +1,7 @@
-//	
+//
 //  repromatic_utils.h
-//  Created by ptrckr on 24.03.18.	
-//	
+//  Created by ptrckr on 24.03.18.
+//
 
 #ifndef REPROMATIC_H
 #define REPROMATIC_H
@@ -9,9 +9,8 @@
 #include <string>
 #include <functional>
 #include <vector>
-
 #ifndef MAC_PLATFORM
-#include "PIHeaders.h"
+  #include "PIHeaders.h"
 #endif
 
 namespace repromatic {
@@ -46,7 +45,7 @@ void IterateFolder(
 
 int GetItemCount(
   ASPathName root,
-  ASFileSys file_system, 
+  ASFileSys file_system,
   std::string filter = ""
 );
 
