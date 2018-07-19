@@ -59,10 +59,17 @@ void Overview() {
       status_monitor.SetText(std::string("[[") + file_name + "]] @ " +
                              std::to_string(iteration) + "/" +
                              std::to_string(files.size()));
+
+      PDDoc pdf_file = PDDocOpen(as_file_path, file_sys, NULL, false);
+      dictionary.AddPagesFrom(pdf_file);
+      PDDocClose(pdf_file);
     }
 
     // Close status monitor
     status_monitor.EndOperation();
+
+    // Alert stringified dictionary
+    AVAlertNote(dictionary.Stringify().c_str());
   }
 }
 

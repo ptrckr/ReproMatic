@@ -1,4 +1,4 @@
-//
+﻿//
 //  dictionaries/dictionary.cc
 //  Created by Patrick Rügheimer on 24.06.18.
 //
@@ -52,7 +52,7 @@ std::string Dictionary<T>::Stringify() const {
       size_page_count += static_cast<int>(size_pages.second.size());
     }
 
-    if (!print_sizes) out << "> ";
+    if (!print_sizes) out << "• ";
     out << page_key << ": " << size_page_count << " Page";
     out << (size_page_count > 1 ? "s" : "") << std::endl;
 
@@ -61,7 +61,7 @@ std::string Dictionary<T>::Stringify() const {
         const std::string &j_key = j->first;
         const auto &j_value = j->second;
 
-        out << "- " << j_key << " (" << j_value.size() << ")";
+        out << "• " << j_key << " (" << j_value.size() << ")";
 
         if (print_pages) {
           out << " @ [";

@@ -1,4 +1,4 @@
-//
+﻿//
 //  pages/page.cc
 //  Created by ptrckr on 24.03.18.
 //
@@ -90,7 +90,7 @@ std::string Page::GetSize() const {
 
   page_size << std::fixed << std::setprecision(0);
   page_size << ConvertPrintUnits::PointToMm(format.width);
-  page_size << " x ";
+  page_size << " × ";
   page_size << ConvertPrintUnits::PointToMm(format.height);
   page_size << " mm";
 

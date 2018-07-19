@@ -1,4 +1,4 @@
-//
+﻿//
 //  pages/scan_page.cc
 //  Created by Patrick Rügheimer on 25.06.18.
 //
@@ -34,14 +34,14 @@ std::string ScanPage::GetSize() const {
 
   page_size << std::fixed << std::setprecision(0);
   page_size << ConvertPrintUnits::PointToMm(GetSpecificWidth()) / 10;  // cm
-  page_size << " x ";
+  page_size << " × ";
   page_size << ConvertPrintUnits::PointToMm(GetSpecificHeight()) / 10;  // cm
 
   return page_size.str();
 }
 
 float ScanPage::GetSpecificWidth() const {
-  return ConvertPrintUnits::MmToPoint(std::ceil(ConvertPrintUnits::PointToMm(format.width) / 10) * 10);
+  return ConvertPrintUnits::MmToPoint(std::ceil(ConvertPrintUnits::PointToMm(format.width) / 100) * 100);
 }
 
 float ScanPage::GetSpecificHeight() const {
