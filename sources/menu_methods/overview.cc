@@ -1,4 +1,4 @@
-//
+﻿//
 //  menu_methods/overview.cc
 //  Created by Patrick Rügheimer on 25.06.18.
 //
@@ -6,6 +6,8 @@
 #include "overview.h"
 #include <sstream>
 #include <string>
+#include <exception>  // std::exception
+#include <vector>
 #include "dictionaries/dictionary.h"
 #include "dictionaries/din_dictionary.h"
 #include "dictionaries/scan_dictionary.h"
@@ -19,6 +21,7 @@ template<typename T>
 void Overview() {
   T dictionary;
   AVDoc av_active_document = AVAppGetActiveDoc();
+  std::vector<std::string> irreparable_files;
 
   if (av_active_document) {
     PDDoc pd_active_document = AVDocGetPDDoc(av_active_document);
@@ -34,8 +37,7 @@ void Overview() {
     }
 
     // Get files
-    std::vector<std::string> files;
-    files = repromatic::QueryFolder(file_sys, kASFileSysFile, root, true);
+    std::vector<std::string> files = repromatic::QueryFolder(file_sys, kASFileSysFile, root, true);
 
     // Status monitor
     repromatic::acrobat_utils::StatusMonitorUtil status_monitor;
@@ -49,7 +51,6 @@ void Overview() {
       char* file_path_cstr = ASFileSysDIPathFromPath(file_sys, as_file_path_parent, root);
       char* file_name_cstr = ASFileSysDIPathFromPath(file_sys, as_file_path, as_file_path_parent);
       ASFileSysReleasePath(file_sys, as_file_path_parent);
-      ASFileSysReleasePath(file_sys, as_file_path);
       std::string file_path(file_path_cstr);
       std::string file_name(file_name_cstr);
       ASfree(file_path_cstr);
@@ -60,13 +61,32 @@ void Overview() {
                              std::to_string(iteration) + "/" +
                              std::to_string(files.size()));
 
-      PDDoc pdf_file = PDDocOpen(as_file_path, file_sys, NULL, false);
-      dictionary.AddPagesFrom(pdf_file);
-      PDDocClose(pdf_file);
+      DURING
+        PDDoc pdf_file = PDDocOpen(as_file_path, file_sys, NULL, true);
+        dictionary.AddPagesFrom(pdf_file);
+        PDDocClose(pdf_file);
+      HANDLER
+        irreparable_files.push_back(file_name + " (" + file_path + ")");
+      END_HANDLER
+
+      ASFileSysReleasePath(file_sys, as_file_path);
     }
 
     // Close status monitor
     status_monitor.EndOperation();
+
+    // Alert files hat are damaged and could not be repaired
+    if (!irreparable_files.empty()) {
+      std::stringstream error_msg;
+      error_msg << "Following files are damaged and could not be repaired." << std::endl;
+      error_msg << "They have NOT been processed and will not be included in the overview." << std::endl << std::endl;
+
+      for (const std::string& irreparable_file : irreparable_files) {
+        error_msg << "• " <<  irreparable_file << std::endl;
+      }
+
+      AVAlertNote(error_msg.str().c_str());
+    }
 
     // Alert stringified dictionary
     AVAlertNote(dictionary.Stringify().c_str());
