@@ -6,7 +6,6 @@
 #include "overview.h"
 #include <sstream>
 #include <string>
-#include <exception>  // std::exception
 #include <vector>
 #include "dictionaries/dictionary.h"
 #include "dictionaries/din_dictionary.h"
@@ -20,12 +19,12 @@
 template<typename T>
 void Overview() {
   T dictionary;
-  AVDoc av_active_document = AVAppGetActiveDoc();
-  std::vector<std::string> irreparable_files;
+  AVDoc active_document;
 
-  if (av_active_document) {
-    PDDoc pd_active_document = AVDocGetPDDoc(av_active_document);
-    dictionary.AddPagesFrom(pd_active_document);
+  if (active_document = AVAppGetActiveDoc()) {
+    dictionary.AddPagesFrom(AVDocGetPDDoc(active_document));
+
+    // Alert stringified dictionary
     AVAlertNote(dictionary.Stringify().c_str());
   } else {
     // Get root folder
@@ -38,6 +37,7 @@ void Overview() {
 
     // Get files
     std::vector<std::string> files = repromatic::QueryFolder(file_sys, kASFileSysFile, root, true);
+    std::vector<std::string> irreparable_files;
 
     // Status monitor
     repromatic::acrobat_utils::StatusMonitorUtil status_monitor;
@@ -57,16 +57,14 @@ void Overview() {
       ASfree(file_name_cstr);
 
       status_monitor.SetValue(iteration++);
-      status_monitor.SetText(std::string("[[") + file_name + "]] @ " +
-                             std::to_string(iteration) + "/" +
-                             std::to_string(files.size()));
+      status_monitor.SetText(std::to_string(iteration) + " of " + std::to_string(files.size()));
 
       DURING
         PDDoc pdf_file = PDDocOpen(as_file_path, file_sys, NULL, true);
         dictionary.AddPagesFrom(pdf_file);
         PDDocClose(pdf_file);
       HANDLER
-        irreparable_files.push_back(file_name + " (" + file_path + ")");
+        irreparable_files.push_back(file_name + (file_path.length() == 0 ? "" : " (" + file_path + ")"));
       END_HANDLER
 
       ASFileSysReleasePath(file_sys, as_file_path);
@@ -75,21 +73,26 @@ void Overview() {
     // Close status monitor
     status_monitor.EndOperation();
 
-    // Alert files hat are damaged and could not be repaired
+    // Alert files that are damaged and could not be repaired
     if (!irreparable_files.empty()) {
       std::stringstream error_msg;
+
       error_msg << "Following files are damaged and could not be repaired." << std::endl;
       error_msg << "They have NOT been processed and will not be included in the overview." << std::endl << std::endl;
 
-      for (const std::string& irreparable_file : irreparable_files) {
-        error_msg << "• " <<  irreparable_file << std::endl;
+      for (auto i = irreparable_files.begin(); i != irreparable_files.end(); ++i) {
+        error_msg << "• " <<  *i;
+
+        if (i != --irreparable_files.end()) {
+          error_msg << std::endl;
+        }
       }
 
       AVAlertNote(error_msg.str().c_str());
     }
 
     // Alert stringified dictionary
-    AVAlertNote(dictionary.Stringify().c_str());
+    AVAlertNote(dictionary.Stringify(false, true).c_str());
   }
 }
 

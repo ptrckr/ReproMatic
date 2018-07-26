@@ -29,10 +29,7 @@ void Dictionary<T>::AddPagesFrom(PDDoc pd_doc) {
 }
 
 template<typename T>
-std::string Dictionary<T>::Stringify() const {
-  bool print_sizes = true;
-  bool print_pages = true;
-
+std::string Dictionary<T>::Stringify(bool print_page_number, bool print_page_format) const {
   std::map<std::string, std::map<std::string, std::vector<int>>> sorted_pages;
 
   for (const T &page : pages) {
@@ -52,18 +49,18 @@ std::string Dictionary<T>::Stringify() const {
       size_page_count += static_cast<int>(size_pages.second.size());
     }
 
-    if (!print_sizes) out << "• ";
+    if (!print_page_format) out << "• ";
     out << page_key << ": " << size_page_count << " Page";
     out << (size_page_count > 1 ? "s" : "") << std::endl;
 
-    if (print_sizes) {
+    if (print_page_format) {
       for (auto j = sizes.begin(); j != sizes.end(); ++j) {
         const std::string &j_key = j->first;
         const auto &j_value = j->second;
 
         out << "• " << j_key << " (" << j_value.size() << ")";
 
-        if (print_pages) {
+        if (print_page_number) {
           out << " @ [";
 
           int start = *j_value.begin();

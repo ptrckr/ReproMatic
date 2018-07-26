@@ -24,7 +24,7 @@ public:
   void AddPagesFrom(PDDoc pd_doc);
   virtual std::string GetKey() const = 0;
   virtual bool Contains(std::string key) const = 0;
-  std::string Stringify() const;
+  std::string Stringify(bool print_page_number = true, bool print_page_format = true) const;
   std::vector<T> GetPages() const;
 };
 
