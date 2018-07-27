@@ -39,7 +39,7 @@ void Overview() {
   std::vector<std::string> files = repromatic::QueryFolder(file_sys, kASFileSysFile, root, true);
   std::vector<std::string> irreparable_files;
 
-  // Status monitor
+  // Set up status monitor
   repromatic::acrobat_utils::StatusMonitorUtil status_monitor;
   status_monitor.SetDuration(static_cast<int>(files.size()));
 
@@ -56,20 +56,23 @@ void Overview() {
       dictionary.AddPagesFrom(pdf_file);
       PDDocClose(pdf_file);
     HANDLER
-      irreparable_files.push_back(filename + (file_path.length() == 0 ? "" : " (" + file_path + ")"));
+      irreparable_files.push_back(
+        filename + (file_path.length() == 0 ? "" : " (" + file_path + ")")
+      );
     END_HANDLER
 
     ASFileSysReleasePath(file_sys, as_file_path);
   }
 
-  // Close status monitor
+  // Clean up
+  ASFileSysReleasePath(file_sys, root);
   status_monitor.EndOperation();
 
   // Alert files that are damaged and could not be repaired
   if (!irreparable_files.empty()) {
     std::stringstream error_msg;
 
-    error_msg << "Following files are damaged and could not be repaired." << std::endl;
+    error_msg << "The following files are damaged and could not be repaired." << std::endl;
     error_msg << "They have NOT been processed and will not be included in the overview." << std::endl << std::endl;
 
     for (auto i = irreparable_files.begin(); i != irreparable_files.end(); ++i) {
