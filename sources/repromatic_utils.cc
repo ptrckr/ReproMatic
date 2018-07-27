@@ -165,4 +165,32 @@ ASPathName GetFirstPdfFileInFolder(ASFileSys file_system, ASPathName folder) {
   return first_file;
 }
 
+std::string GetParentPathFromDIPath(std::string path, ASFileSys file_sys, ASPathName relative_to) {
+  ASPathName as_path = ASFileSysPathFromDIPath(file_sys, path.c_str(), 0);
+  ASPathName as_parent_path = ASFileSysAcquireParent(file_sys, as_path);
+  ASFileSysReleasePath(file_sys, as_path);
+
+  char* path_cstr = ASFileSysDIPathFromPath(file_sys, as_parent_path, relative_to);
+  ASFileSysReleasePath(file_sys, as_parent_path);
+
+  std::string file_path(path_cstr);
+  ASfree(path_cstr);
+
+  return file_path;
+}
+
+std::string GetFilenameFromDIPath(std::string path, ASFileSys file_sys) {
+  ASPathName as_path = ASFileSysPathFromDIPath(file_sys, path.c_str(), 0);
+  ASPathName as_parent_path = ASFileSysAcquireParent(file_sys, as_path);
+
+  char* path_cstr = ASFileSysDIPathFromPath(file_sys, as_path, as_parent_path);
+  ASFileSysReleasePath(file_sys, as_path);
+  ASFileSysReleasePath(file_sys, as_parent_path);
+
+  std::string filename(path_cstr);
+  ASfree(path_cstr);
+
+  return filename;
+}
+
 }  // repromatic

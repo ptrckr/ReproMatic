@@ -54,6 +54,9 @@ ASPathName GetFirstPdfFileInFolder(
   ASPathName folder
 );
 
+std::string GetParentPathFromDIPath(std::string path, ASFileSys file_sys, ASPathName relative_to);
+std::string GetFilenameFromDIPath(std::string path, ASFileSys file_sys);
+
 }  // repromatic
 
 #endif
