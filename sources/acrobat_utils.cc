@@ -147,11 +147,26 @@ void StatusMonitorUtil::SetText(std::string text) {
   }
 }
 
-void StatusMonitorUtil::SetValue(int value) {
+void StatusMonitorUtil::SetValue(int value, bool automatically_set_text) {
   if (monitor.progMon && monitor.progMon->setCurrValue) {
-    monitor.progMon->setCurrValue(
-      value, monitor.progMonClientData
-    );
+    monitor.progMon->setCurrValue(value, monitor.progMonClientData);
+
+    if (automatically_set_text) {
+      int duration = monitor.progMon->getDuration(monitor.progMonClientData);
+      int percentage = static_cast<int>(100.0f / duration * value);
+
+      int ascii_progress_bars = 20;
+      std::string ascii_progress;
+      int ascii_progress_steps = static_cast<int>(ascii_progress_bars / 100.0f * percentage);
+      ascii_progress.insert(0, ascii_progress_steps, '|');
+      ascii_progress.append(ascii_progress_bars - ascii_progress_steps, '.');
+
+      SetText(
+        std::to_string(percentage) + "% " +
+        ascii_progress + " " + std::to_string(value) + " of " +
+        std::to_string(monitor.progMon->getDuration(monitor.progMonClientData))
+      );
+    }
   }
 }
 
@@ -170,31 +185,6 @@ ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder) {
 
   return AVAppChooseFolderDialog(&params, &file_system, &folder);
 };
-
-AVStatusMonitorProcsRec GetStatusMonitor() {
-  AVStatusMonitorProcsRec status_monitor;
-  memset(&status_monitor, 0, sizeof(status_monitor));
-  status_monitor.size = sizeof(status_monitor);
-  status_monitor.cancelProc = AVAppGetCancelProc(&status_monitor.cancelProcClientData);
-  status_monitor.progMon = AVAppGetDocProgressMonitor(&status_monitor.progMonClientData);
-  status_monitor.reportProc = AVAppGetReportProc(&status_monitor.reportProcClientData);
-
-  if (status_monitor.progMon) {
-    if (status_monitor.progMon->beginOperation) {
-      status_monitor.progMon->beginOperation(status_monitor.progMonClientData);
-    }
-
-    if (status_monitor.progMon->setCurrValue) {
-      status_monitor.progMon->setCurrValue(0, status_monitor.progMonClientData);
-    }
-
-    if (status_monitor.progMon->setDuration) {
-      status_monitor.progMon->setDuration(100, status_monitor.progMonClientData);
-    }
-  }
-
-  return status_monitor;
-}
 
 AVIconBundle6 GetIconByResourceId(int resource_id) {
   HRSRC resource = FindResource(gHINSTANCE, MAKEINTRESOURCE(resource_id), "PNG");

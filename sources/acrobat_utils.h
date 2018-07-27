@@ -48,13 +48,11 @@ public:
   StatusMonitorUtil();
   void SetDuration(int duration);
   void SetText(std::string text);
-  void SetValue(int value);
+  void SetValue(int value, bool automatically_set_text = true);
   void EndOperation();
 };
 
 ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder);
-
-AVStatusMonitorProcsRec GetStatusMonitor();
 
 AVIconBundle6 GetIconByResourceId(int resource_id);
 

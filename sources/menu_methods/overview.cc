@@ -44,14 +44,12 @@ void Overview() {
   status_monitor.SetDuration(static_cast<int>(files.size()));
 
   // Iterate files
-  int iteration = 0;
-  for (const std::string& file : files) {
-    ASPathName as_file_path = ASFileSysPathFromDIPath(file_sys, file.c_str(), 0);
-    std::string file_path = repromatic::GetParentPathFromDIPath(file, file_sys, root);
-    std::string filename = repromatic::GetFilenameFromDIPath(file, file_sys);
+  for (auto file = files.begin(); file != files.end(); ++file) {
+    ASPathName as_file_path = ASFileSysPathFromDIPath(file_sys, (*file).c_str(), 0);
+    std::string file_path = repromatic::GetParentPathFromDIPath(*file, file_sys, root);
+    std::string filename = repromatic::GetFilenameFromDIPath(*file, file_sys);
 
-    status_monitor.SetValue(iteration++);
-    status_monitor.SetText(std::to_string(iteration) + " of " + std::to_string(files.size()));
+    status_monitor.SetValue(file - files.begin());
 
     DURING
       PDDoc pdf_file = PDDocOpen(as_file_path, file_sys, NULL, true);
