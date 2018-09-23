@@ -15,12 +15,15 @@
 namespace repromatic {
 
 struct ScanPage : public Page {
+private:
+  float tolerance;
+
 public:
   ScanPage(PDPage pd_page, int num);
   std::string GetKey() const;
   std::string GetSize() const;
-  float GetSpecificHeight() const;
-  float GetSpecificWidth() const;
+  float GetSpecificHeight(float height) const;
+  float GetSpecificWidth(float width) const;
 };
 
 }  // repromatic
