@@ -74,7 +74,7 @@ std::string ScanPage::GetSize() const {
 }
 
 float ScanPage::GetSpecificWidth(float width) const {
-  return (std::max)(std::ceil(width / 100) * 100, 600.0f);
+  return (std::max)(std::ceil((width - tolerance) / 100) * 100, 600.0f);
 }
 
 float ScanPage::GetSpecificHeight(float height) const {
