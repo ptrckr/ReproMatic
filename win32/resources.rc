@@ -1,9 +1,7 @@
 #include "resources.h"
 
-IDB_DEFAULT        PNG "../resources/default.png"
-IDB_SUMMARY        PNG "../resources/summary.png"
-IDB_SUMMARY_SIMPLE PNG "../resources/summary_simple.png"
-IDB_DIVIDER        PNG "../resources/divider.png"
-IDB_EXTRACT        PNG "../resources/extract.png"
-IDB_SORT           PNG "../resources/sort_folder.png"
-IDB_SORT_RECURSIVE PNG "../resources/sort_folder_recursive.png"
+IDB_OVERVIEW_ICON_16 ICON "../resources/overview_icon_16.ico"
+IDB_OVERVIEW_ICON_32 ICON "../resources/overview_icon_32.ico"
+
+ROBOTO_REGULAR FONT "../resources/fonts/Roboto-Medium.ttf"
+ROBOTO_BOLD FONT "../resources/fonts/Roboto-Bold.ttf"

@@ -1,33 +1,30 @@
-//
-//  acrobat_utils.cc
-//  Created by Patrick Rügheimer on 24.03.18.
-//
-
 #include "acrobat_utils.h"
+
 #include <vector>
 #include <map>
 #include <string>
 #include <exception>
-#include "resources.h"
+
+#include "versioning.h"
+
 #ifndef MAC_PLATFORM
-  #include "PIHeaders.h"
+  #include "PIMain.h"
 #endif
 
-#if WIN_PLATFORM
-  extern "C" {
-    HINSTANCE gHINSTANCE;
-  }
-#endif
-
-namespace repromatic {
-namespace acrobat_utils {
-
-void MenuUtil::Init() {
+void MenuManager::Init() {
   if (app_menubar = AVAppGetMenubar()) {
-    acrobat_main_menu = AVMenubarAcquireMenuByName(app_menubar, "PTRK:Repromatic2");
+    acrobat_main_menu = AVMenubarAcquireMenuByName(
+      app_menubar,
+      PluginData::FULL_DEV_PLUGIN_NAME.c_str()
+    );
 
     if (!acrobat_main_menu) {
-      acrobat_main_menu = AVMenuNew("Repromatic 2", "PTRK:Repromatic2", gExtensionID);
+      acrobat_main_menu = AVMenuNew(
+        PluginData::FULL_PLUGIN_NAME.c_str(),
+        PluginData::FULL_DEV_PLUGIN_NAME.c_str(),
+        gExtensionID
+      );
+
       AVMenubarAddMenu(app_menubar, acrobat_main_menu, APPEND_MENU);
     }
 
@@ -35,20 +32,20 @@ void MenuUtil::Init() {
   }
 }
 
-void MenuUtil::ReleaseMenus() {
-  for(auto const &menu : created_menus) {
+void MenuManager::ReleaseMenus() {
+  for(const auto &menu : created_menus) {
     AVMenuRelease(menu.second);
   }
 }
 
-void MenuUtil::RemoveMenuItems() {
+void MenuManager::RemoveMenuItems() {
   for (AVMenuItem &menu_item : created_menu_items) {
     AVMenuItemRemove(menu_item);
   }
 }
 
-AVMenu MenuUtil::CreateMenu(std::string menu_name, int resource_id) {
-  if (menu_name == "") {
+AVMenu MenuManager::CreateMenu(std::string menu_name) {
+  if (menu_name.empty()) {
     return acrobat_main_menu;
   }
 
@@ -57,14 +54,20 @@ AVMenu MenuUtil::CreateMenu(std::string menu_name, int resource_id) {
     return menu_search->second;
   }
 
-  AVMenu menu = AVMenuNew(menu_name.c_str(), (std::string("PTRK:") + menu_name).c_str(), gExtensionID);
-  AVMenuItem menu_item = AVMenuItemNew(
+  AVMenu menu = AVMenuNew(
     menu_name.c_str(),
-    (std::string("PTRK:") + menu_name).c_str(),
-    menu, true, NO_SHORTCUT, 0,
-    repromatic::acrobat_utils::GetIconByResourceId(resource_id),
+    (PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
     gExtensionID
   );
+
+  AVMenuItem menu_item = AVMenuItemNew(
+    menu_name.c_str(),
+    (PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
+    menu, true, NO_SHORTCUT, 0,
+    NULL,
+    gExtensionID
+  );
+
   AVMenuAddMenuItem(acrobat_main_menu, menu_item, APPEND_MENUITEM);
 
   created_menus[menu_name] = menu;
@@ -73,18 +76,16 @@ AVMenu MenuUtil::CreateMenu(std::string menu_name, int resource_id) {
   return menu;
 }
 
-void MenuUtil::AddMenuItemToMenu(
+void MenuManager::AddMenuItemToMenu(
     std::string menu,
     std::string menu_item_name,
     AVExecuteProc menu_item_callback,
-    AVComputeEnabledProc menu_item_is_enabled,
-    int resource_id) {
+    AVComputeEnabledProc menu_item_is_enabled) {
   AVMenu parent_menu = CreateMenu(menu);
   AVMenuItem menu_item = AVMenuItemNew(
     menu_item_name.c_str(),
-    (std::string("PTRK:") + menu_item_name).c_str(),
-    NULL, true, NO_SHORTCUT, 0,
-    repromatic::acrobat_utils::GetIconByResourceId(resource_id),
+    (PluginData::DEVELOPER_PREFIX + menu_item_name).c_str(),
+    NULL, true, NO_SHORTCUT, 0, NULL,
     gExtensionID
   );
 
@@ -100,113 +101,3 @@ void MenuUtil::AddMenuItemToMenu(
 
   created_menu_items.push_back(menu_item);
 }
-
-StatusMonitorUtil::StatusMonitorUtil() {
-  pddoc = PDDocCreate();
-  PDPageRelease(
-    PDDocCreatePage(pddoc, PDBeforeFirstPage, ASFixedRect{
-      fixedZero, fixedZero, fixedTen, fixedTen
-    })
-  );
-
-  avdoc = AVDocOpenFromPDDoc(pddoc, NULL);
-
-  memset(&monitor, 0, sizeof(monitor));
-  monitor.size = sizeof(monitor);
-  monitor.cancelProc = AVAppGetCancelProc(&monitor.cancelProcClientData);
-  monitor.progMon = AVAppGetDocProgressMonitor(&monitor.progMonClientData);
-  monitor.reportProc = AVAppGetReportProc(&monitor.reportProcClientData);
-
-  if (monitor.progMon) {
-    if (monitor.progMon->beginOperation) {
-      monitor.progMon->beginOperation(monitor.progMonClientData);
-    }
-
-    if (monitor.progMon->setCurrValue) {
-      monitor.progMon->setCurrValue(0, monitor.progMonClientData);
-    }
-
-    if (monitor.progMon->setDuration) {
-      monitor.progMon->setDuration(100, monitor.progMonClientData);
-    }
-  }
-}
-
-void StatusMonitorUtil::SetDuration(int duration) {
-  if (monitor.progMon->setDuration) {
-    monitor.progMon->setDuration(duration, monitor.progMonClientData);
-  }
-}
-
-void StatusMonitorUtil::SetText(std::string text) {
-  if (monitor.progMon && monitor.progMon->setText) {
-    monitor.progMon->setText(
-      ASTextFromEncoded(text.c_str(), AVAppGetLanguageEncoding()),
-      monitor.progMonClientData
-    );
-  }
-}
-
-void StatusMonitorUtil::SetValue(int value, bool automatically_set_text) {
-  if (monitor.progMon && monitor.progMon->setCurrValue) {
-    monitor.progMon->setCurrValue(value, monitor.progMonClientData);
-
-    if (automatically_set_text) {
-      int duration = monitor.progMon->getDuration(monitor.progMonClientData);
-      int percentage = static_cast<int>(100.0f / duration * value);
-
-      int ascii_progress_bars = 20;
-      std::string ascii_progress;
-      int ascii_progress_steps = static_cast<int>(ascii_progress_bars / 100.0f * percentage);
-      ascii_progress.insert(0, ascii_progress_steps, '|');
-      ascii_progress.append(ascii_progress_bars - ascii_progress_steps, '.');
-
-      SetText(
-        std::to_string(percentage) + "% " +
-        ascii_progress + " " + std::to_string(value) + " of " +
-        std::to_string(monitor.progMon->getDuration(monitor.progMonClientData))
-      );
-    }
-  }
-}
-
-void StatusMonitorUtil::EndOperation() {
-  if (monitor.progMon && monitor.progMon->endOperation) {
-    monitor.progMon->endOperation(monitor.progMonClientData);
-  }
-
-  AVDocClose(avdoc, true);
-}
-
-ASBool GetFolderByDialog(ASFileSys &file_system, ASPathName &folder) {
-  AVOpenSaveDialogParamsRec params;
-  memset(&params, NULL, sizeof(AVOpenSaveDialogParamsRec));
-  params.size = sizeof(AVOpenSaveDialogParamsRec);
-
-  return AVAppChooseFolderDialog(&params, &file_system, &folder);
-};
-
-AVIconBundle6 GetIconByResourceId(int resource_id) {
-  HRSRC resource = FindResource(gHINSTANCE, MAKEINTRESOURCE(resource_id), "PNG");
-
-  if(resource == NULL) {
-    throw std::runtime_error("Resource could not be found.");
-  }
-
-  DWORD resourceSize = SizeofResource(gHINSTANCE, resource);
-  HGLOBAL glob = LoadResource(gHINSTANCE, resource);
-  LPVOID resouceArray = LockResource(glob);
-  ASUns8* data = (ASUns8*)ASmalloc(resourceSize + 1);
-  memcpy(data, resouceArray, resourceSize);
-
-  AVIconDataRec iconData;
-  iconData.dataStm = ASMemStmRdOpen((char*)data, resourceSize);
-  iconData.eColorFormat = kAVIconColor;
-
-  AVIconBundle6 iconBundle = AVAppCreateIconBundle6(kAVIconPNG, &iconData, 1);
-
-  return iconBundle;
-}
-
-}  // acrobat_utils
-}  // repromatic
