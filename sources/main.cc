@@ -1,7 +1,9 @@
 #include <string>
 
-#include "versioning.h"
+#include "plugin_data.h"
+#include "app/app.h"
 #include "acrobat_utils.h"  // ACROBAT_UTILS::MenuManager
+#include "utils/convert.h"  // WideToNarrowString
 
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
@@ -10,9 +12,9 @@
 static MenuManager menu_manager;
 
 ASAtom GetExtensionName() {
-  std::string extension_name = PluginData::DEVELOPER_PREFIX + PluginData::PLUGIN_NAME + PluginData::CURRENT_VERSION;
+  std::wstring extension_name = PluginData::DEVELOPER_PREFIX + PluginData::PLUGIN_NAME + PluginData::CURRENT_VERSION;
 
-  return ASAtomFromString(extension_name.c_str());
+  return ASAtomFromString(WideToNarrowString(extension_name).c_str());
 }
 
 ACCB1 ASBool ACCB2 PluginExportHFTs(void) {
@@ -23,22 +25,14 @@ ACCB1 ASBool ACCB2 PluginImportReplaceAndRegister(void) {
   return true;
 }
 
-ACCB1 void ACCB2 LaunchRepromatic2(void *clientData) {
-  AVAlertNote("foo"); 
-}
-
-ACCB1 ASBool ACCB2 LaunchRepromatic2IsEnabled(void *clientData) {
-  return true;
-}
-
 ACCB1 ASBool ACCB2 PluginInit(void) {
   menu_manager.Init();
 
   DURING
     menu_manager.AddMenuItemToMenu(
-      "", "Launch Repromatic " + PluginData::CURRENT_VERSION,
-      ASCallbackCreateProto(AVExecuteProc, LaunchRepromatic2),
-      ASCallbackCreateProto(AVComputeEnabledProc, LaunchRepromatic2IsEnabled)
+      L"", L"Launch Repromatic " + PluginData::CURRENT_VERSION,
+      ASCallbackCreateProto(AVExecuteProc, LaunchRepromaticWindow),
+      ASCallbackCreateProto(AVComputeEnabledProc, LaunchRepromaticWindowIsEnabled)
     );
 
     menu_manager.ReleaseMenus();

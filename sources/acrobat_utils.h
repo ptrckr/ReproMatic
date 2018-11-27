@@ -14,7 +14,7 @@ private:
   AVMenubar app_menubar;
   AVMenu acrobat_main_menu;
 
-  std::map<std::string, AVMenu> created_menus;
+  std::map<std::wstring, AVMenu> created_menus;
   std::vector<AVMenuItem> created_menu_items;
 
 public:
@@ -22,11 +22,11 @@ public:
   void ReleaseMenus();
   void RemoveMenuItems();
 
-  AVMenu CreateMenu(std::string menu_name);
+  AVMenu CreateMenu(std::wstring menu_name);
 
   void AddMenuItemToMenu(
-    std::string menu,
-    std::string menu_item_name,
+    std::wstring menu,
+    std::wstring menu_item_name,
     AVExecuteProc menu_item_callback,
     AVComputeEnabledProc menu_item_is_enabled
   );

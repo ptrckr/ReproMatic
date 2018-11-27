@@ -1,5 +1,19 @@
 #include "resources.h"
 
+#include "WinUser.h"  // WM_APP
+
+IDR_REPROMATIC_MENU MENU {
+  POPUP "File" {
+    MENUITEM "Close", ID_FILE_CLOSE
+  }
+
+  POPUP "Format" {
+    MENUITEM "DIN A", 301, CHECKED
+    MENUITEM "DIN B", 302,
+    MENUITEM "DIN C", 303
+  }
+}
+
 IDB_OVERVIEW_ICON_16 ICON "../resources/overview_icon_16.ico"
 IDB_OVERVIEW_ICON_32 ICON "../resources/overview_icon_32.ico"
 

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Headers\API\PIMain.c" />
+    <ClCompile Include="..\sources\acrobat_utils.cc" />
+    <ClCompile Include="..\sources\main.cc" />
+    <ClCompile Include="..\sources\plugin_data.cc" />
+    <ClCompile Include="..\sources\app\procedure.cc">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\app\app.cc">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\utils\convert.cc">
+      <Filter>Utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\sources\acrobat_utils.h" />
+    <ClInclude Include="resources.h" />
+    <ClInclude Include="..\sources\plugin_data.h" />
+    <ClInclude Include="..\sources\app\app.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\app\procedure.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\utils\convert.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="App">
+      <UniqueIdentifier>{687b75a3-ad80-4383-9e02-0f1ae6025b3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{db38307f-5f2c-44ea-9e7c-a9b8543c9d12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

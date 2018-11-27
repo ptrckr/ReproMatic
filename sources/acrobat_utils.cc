@@ -5,7 +5,8 @@
 #include <string>
 #include <exception>
 
-#include "versioning.h"
+#include "plugin_data.h"
+#include "utils/convert.h"  // WideToNarrowString
 
 #ifndef MAC_PLATFORM
   #include "PIMain.h"
@@ -15,20 +16,20 @@ void MenuManager::Init() {
   if (app_menubar = AVAppGetMenubar()) {
     acrobat_main_menu = AVMenubarAcquireMenuByName(
       app_menubar,
-      PluginData::FULL_DEV_PLUGIN_NAME.c_str()
+      WideToNarrowString(PluginData::FULL_DEV_PLUGIN_NAME).c_str()
     );
 
     if (!acrobat_main_menu) {
       acrobat_main_menu = AVMenuNew(
-        PluginData::FULL_PLUGIN_NAME.c_str(),
-        PluginData::FULL_DEV_PLUGIN_NAME.c_str(),
+        WideToNarrowString(PluginData::FULL_PLUGIN_NAME).c_str(),
+        WideToNarrowString(PluginData::FULL_DEV_PLUGIN_NAME).c_str(),
         gExtensionID
       );
 
       AVMenubarAddMenu(app_menubar, acrobat_main_menu, APPEND_MENU);
     }
 
-    created_menus["acrobat_main_menu"] = acrobat_main_menu;
+    created_menus[L"acrobat_main_menu"] = acrobat_main_menu;
   }
 }
 
@@ -44,7 +45,7 @@ void MenuManager::RemoveMenuItems() {
   }
 }
 
-AVMenu MenuManager::CreateMenu(std::string menu_name) {
+AVMenu MenuManager::CreateMenu(std::wstring menu_name) {
   if (menu_name.empty()) {
     return acrobat_main_menu;
   }
@@ -55,14 +56,14 @@ AVMenu MenuManager::CreateMenu(std::string menu_name) {
   }
 
   AVMenu menu = AVMenuNew(
-    menu_name.c_str(),
-    (PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
+    WideToNarrowString(menu_name).c_str(),
+    WideToNarrowString(PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
     gExtensionID
   );
 
   AVMenuItem menu_item = AVMenuItemNew(
-    menu_name.c_str(),
-    (PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
+    WideToNarrowString(menu_name).c_str(),
+    WideToNarrowString(PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
     menu, true, NO_SHORTCUT, 0,
     NULL,
     gExtensionID
@@ -77,14 +78,14 @@ AVMenu MenuManager::CreateMenu(std::string menu_name) {
 }
 
 void MenuManager::AddMenuItemToMenu(
-    std::string menu,
-    std::string menu_item_name,
+    std::wstring menu,
+    std::wstring menu_item_name,
     AVExecuteProc menu_item_callback,
     AVComputeEnabledProc menu_item_is_enabled) {
   AVMenu parent_menu = CreateMenu(menu);
   AVMenuItem menu_item = AVMenuItemNew(
-    menu_item_name.c_str(),
-    (PluginData::DEVELOPER_PREFIX + menu_item_name).c_str(),
+    WideToNarrowString(menu_item_name).c_str(),
+    WideToNarrowString(PluginData::DEVELOPER_PREFIX + menu_item_name).c_str(),
     NULL, true, NO_SHORTCUT, 0, NULL,
     gExtensionID
   );
