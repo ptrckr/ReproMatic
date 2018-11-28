@@ -9,18 +9,20 @@
   <ItemGroup>
     <ClCompile Include="..\..\Headers\API\PIMain.c" />
     <ClCompile Include="..\sources\acrobat_utils.cc" />
-    <ClCompile Include="..\sources\app\app.cc" />
+    <ClCompile Include="..\sources\app\create_window.cc" />
     <ClCompile Include="..\sources\app\procedure.cc" />
+    <ClCompile Include="..\sources\app\state.cc" />
     <ClCompile Include="..\sources\main.cc" />
     <ClCompile Include="..\sources\plugin_data.cc" />
     <ClCompile Include="..\sources\utils\convert.cc" />
+    <ClInclude Include="..\sources\app\state.h" />
     <ClInclude Include="..\sources\utils\convert.h">
       <FileType>CppCode</FileType>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sources\acrobat_utils.h" />
-    <ClInclude Include="..\sources\app\app.h" />
+    <ClInclude Include="..\sources\app\create_window.h" />
     <ClInclude Include="..\sources\app\procedure.h" />
     <ClInclude Include="..\sources\plugin_data.h" />
     <ClInclude Include="resources.h" />

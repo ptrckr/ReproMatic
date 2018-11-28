@@ -8,25 +8,31 @@
     <ClCompile Include="..\sources\app\procedure.cc">
       <Filter>App</Filter>
     </ClCompile>
-    <ClCompile Include="..\sources\app\app.cc">
-      <Filter>App</Filter>
-    </ClCompile>
     <ClCompile Include="..\sources\utils\convert.cc">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\app\create_window.cc">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\app\state.cc">
+      <Filter>App</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sources\acrobat_utils.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="..\sources\plugin_data.h" />
-    <ClInclude Include="..\sources\app\app.h">
-      <Filter>App</Filter>
-    </ClInclude>
     <ClInclude Include="..\sources\app\procedure.h">
       <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="..\sources\utils\convert.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\app\create_window.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\app\state.h">
+      <Filter>App</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

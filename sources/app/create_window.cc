@@ -1,10 +1,11 @@
-#include "app/app.h"
-
-#include <string>  // std::to_string
+#include "app/create_window.h"
 
 #include "plugin_data.h"
+#include "app/state.h"
 #include "app/procedure.h"
 #include "resources.h"  // IDR_REPROMATIC_MENU
+
+#include <string>  // std::to_string
 
 #ifndef MAC_PLATFORM
   #include "PIMain.h"  // gHINSTANCE
@@ -46,25 +47,24 @@ ACCB1 void ACCB2 LaunchRepromaticWindow(void *clientData) {
   ATOM window_atom;
   window_atom = RegisterClassExW(&window_class);
   if(!window_atom) {
-    DWORD a = GetLastError();
-    AVAlertNote(std::to_string(a).c_str());
+    AVAlertNote(std::to_string(GetLastError()).c_str());
     AVAlertNote("Could not register `WNDCLASSEXA'.");
     return;
   }
 
-  HWND window_handle;
-  window_handle = CreateWindowExW(
+  State state;
+  HWND window_handle = CreateWindowExW(
     WS_EX_TOPMOST | WS_EX_ACCEPTFILES | WS_EX_APPWINDOW,
     reinterpret_cast<LPCTSTR>(window_atom),
     (PluginData::FULL_PLUGIN_NAME + L"  \u2014  ptrc.kr").c_str(),
     WS_OVERLAPPEDWINDOW,
     CW_USEDEFAULT, CW_USEDEFAULT,
     PluginData::WINDOW_WIDTH, PluginData::WINDOW_HEIGHT, 0, 0,
-    gHINSTANCE, NULL
+    gHINSTANCE, &state
   );
 
   if(window_handle == NULL) {
-    AVAlertNote("Window could not be created.");
+    AVAlertNote("`CreateWindowExW' failed, the window could not be created.");
     UnregisterClassW(window_class.lpszClassName, gHINSTANCE);
     return;
   }
@@ -76,7 +76,7 @@ ACCB1 void ACCB2 LaunchRepromaticWindow(void *clientData) {
   MSG window_message;
   while(message_return = GetMessage(&window_message, NULL, 0, 0) > 0) {
     if (message_return == -1) {
-      AVAlertNote("Invalid `HWND' in GetMessage.");
+      AVAlertNote("Invalid `HWND' in GetMessage().");
       return;
     }
 
