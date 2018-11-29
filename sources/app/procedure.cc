@@ -2,47 +2,66 @@
 
 #include "app/state.h"
 #include "resources.h"
+#include "utils/convert.h"  // WideToNarrowString
 
 #include <string>
 
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
+  #include <shellapi.h>  // DragQueryFileA
 #endif
 
-#include <string>
-
 LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, LPARAM lParam) {
-  State* state;
-  if (msg == WM_CREATE) {
-    CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-    state = reinterpret_cast<State*>(pCreate->lpCreateParams);
-    SetWindowLongPtr(window_handle, GWLP_USERDATA, (LONG_PTR)state);
-  } else {
+  AppState* state;
+  if (msg != WM_CREATE) {
     LONG_PTR ptr = GetWindowLongPtr(window_handle, GWLP_USERDATA);
-    state = reinterpret_cast<State*>(ptr);
+    state = reinterpret_cast<AppState*>(ptr);
   }
 
   switch(msg) {
-    case WM_CREATE:
+    case WM_CREATE: {
+      // Set state pointer
+      CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(lParam);
+      state = reinterpret_cast<AppState*>(create_struct->lpCreateParams);
+      SetWindowLongPtr(window_handle, GWLP_USERDATA, (LONG_PTR)state);
+
       // Set the client area
       if(GetClientRect(window_handle, &state->window_client_rect)) {
         state->client_width = static_cast<float>(state->window_client_rect.right - state->window_client_rect.left);
         state->client_height = static_cast<float>(state->window_client_rect.bottom - state->window_client_rect.top);
       } else {
-        AVAlertNote("Error calling `GetClientRect'.");
+        AVAlertNote("Error calling `GetClientRect()'.");
         return -1;
       }
-      break;
+      } break;
 
     case WM_COMMAND:
       switch(LPARAM(wParam)) {
         case IDM_FILE_CLOSE:
-          std::string y = "Client area is width: " + std::to_string(state->client_width);
-          AVAlertNote(y.c_str());
           PostMessageW(window_handle, WM_CLOSE, 0, 0);
           break;
       }
       break;
+    
+    case WM_DROPFILES: {
+      int file_count = DragQueryFileW(reinterpret_cast<HDROP>(wParam), 0xFFFFFFFF, NULL, NULL);
+      int buffer_size = DragQueryFileW(reinterpret_cast<HDROP>(wParam), 0, NULL, NULL);
+
+      buffer_size += 1;
+      LPWSTR buffer = new WCHAR[buffer_size];
+
+      int drag_query_res = DragQueryFileW(reinterpret_cast<HDROP>(wParam), 0, buffer, buffer_size);
+
+      if (drag_query_res == 0) {
+        AVAlertNote("Error calling `DragQueryFileW()'.");
+      } else {
+        MessageBoxW(window_handle, buffer, L"Dropped file", MB_OK | MB_ICONASTERISK);
+      }
+
+      delete[] buffer;
+
+      return 0;
+    }
 
     case WM_CLOSE:
       DestroyWindow(window_handle);

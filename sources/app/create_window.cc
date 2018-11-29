@@ -52,7 +52,7 @@ ACCB1 void ACCB2 LaunchRepromaticWindow(void *clientData) {
     return;
   }
 
-  State state;
+  AppState state;
   HWND window_handle = CreateWindowExW(
     WS_EX_TOPMOST | WS_EX_ACCEPTFILES | WS_EX_APPWINDOW,
     reinterpret_cast<LPCTSTR>(window_atom),
