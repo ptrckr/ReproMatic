@@ -3,12 +3,12 @@
 #include "app/state.h"
 #include "resources.h"
 #include "utils/convert.h"  // WideToNarrowString
+#include "procedures/WM_DROPFILES.h"  // WM_DROPFILES_FUNC
 
 #include <string>
 
 #ifndef MAC_PLATFORM
   #include "PIHeaders.h"
-  #include <shellapi.h>  // DragQueryFileA
 #endif
 
 LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -43,25 +43,8 @@ LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, 
       }
       break;
     
-    case WM_DROPFILES: {
-      int file_count = DragQueryFileW(reinterpret_cast<HDROP>(wParam), 0xFFFFFFFF, NULL, NULL);
-      int buffer_size = DragQueryFileW(reinterpret_cast<HDROP>(wParam), 0, NULL, NULL);
-
-      buffer_size += 1;
-      LPWSTR buffer = new WCHAR[buffer_size];
-
-      int drag_query_res = DragQueryFileW(reinterpret_cast<HDROP>(wParam), 0, buffer, buffer_size);
-
-      if (drag_query_res == 0) {
-        AVAlertNote("Error calling `DragQueryFileW()'.");
-      } else {
-        MessageBoxW(window_handle, buffer, L"Dropped file", MB_OK | MB_ICONASTERISK);
-      }
-
-      delete[] buffer;
-
-      return 0;
-    }
+    case WM_DROPFILES:
+      return WM_DROPFILES_FUNC(state, window_handle, reinterpret_cast<HDROP>(wParam));
 
     case WM_CLOSE:
       DestroyWindow(window_handle);

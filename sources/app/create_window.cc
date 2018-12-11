@@ -56,7 +56,7 @@ ACCB1 void ACCB2 LaunchRepromaticWindow(void *clientData) {
   HWND window_handle = CreateWindowExW(
     WS_EX_TOPMOST | WS_EX_ACCEPTFILES | WS_EX_APPWINDOW,
     reinterpret_cast<LPCTSTR>(window_atom),
-    (PluginData::FULL_PLUGIN_NAME + L"  \u2014  ptrc.kr").c_str(),
+    (PluginData::FULL_PLUGIN_NAME + L"  \u2014  ptrckr.com").c_str(),
     WS_OVERLAPPEDWINDOW,
     CW_USEDEFAULT, CW_USEDEFAULT,
     PluginData::WINDOW_WIDTH, PluginData::WINDOW_HEIGHT, 0, 0,
