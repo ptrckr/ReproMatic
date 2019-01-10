@@ -7,6 +7,6 @@
   #include "PIHeaders.h"
 #endif
 
-int WM_DROPFILES_FUNC(AppState* state, HWND window_handle, HDROP hdrop);
+int WM_DROPFILES_FUNC(app_state *state, HWND window_handle, HDROP hdrop);
 
 #endif

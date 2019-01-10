@@ -1,7 +1,7 @@
 #include "WM_DROPFILES.h"
 
 #include "app/state.h"
-#include "app/classes/FileStorage.h"
+#include "app/classes/file_storage.h"
 
 #include <string>
 
@@ -10,7 +10,7 @@
   #include <shellapi.h>  // DragQueryFileW
 #endif
 
-int WM_DROPFILES_FUNC(AppState* state, HWND window_handle, HDROP hdrop) {
+int WM_DROPFILES_FUNC(app_state *state, HWND window_handle, HDROP hdrop) {
   int file_count = DragQueryFileW(hdrop, 0xFFFFFFFF, NULL, NULL);
   if (file_count == 0) {
     MessageBoxW(window_handle, L"Could not query filecount.", L"WM_DROPFILES::DragQueryFileW", MB_OK);
@@ -32,8 +32,8 @@ int WM_DROPFILES_FUNC(AppState* state, HWND window_handle, HDROP hdrop) {
       return 0;
     }
 
-    state->files.AddFile(std::wstring(buffer));
-    MessageBoxW(window_handle, buffer, L"Dropped file", MB_OK | MB_ICONASTERISK);
+    state->files.add_file(std::wstring(buffer));
+    //MessageBoxW(window_handle, buffer, L"Dropped file", MB_OK | MB_ICONASTERISK);
     delete[] buffer;
   }
 

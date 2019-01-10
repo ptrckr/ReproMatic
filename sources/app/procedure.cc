@@ -12,17 +12,17 @@
 #endif
 
 LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, LPARAM lParam) {
-  AppState* state;
+  app_state* state;
   if (msg != WM_CREATE) {
     LONG_PTR ptr = GetWindowLongPtr(window_handle, GWLP_USERDATA);
-    state = reinterpret_cast<AppState*>(ptr);
+    state = reinterpret_cast<app_state*>(ptr);
   }
 
   switch(msg) {
     case WM_CREATE: {
       // Set state pointer
       CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(lParam);
-      state = reinterpret_cast<AppState*>(create_struct->lpCreateParams);
+      state = reinterpret_cast<app_state*>(create_struct->lpCreateParams);
       SetWindowLongPtr(window_handle, GWLP_USERDATA, (LONG_PTR)state);
 
       // Set the client area

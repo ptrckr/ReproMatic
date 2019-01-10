@@ -1,16 +1,16 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "app/classes/FileStorage.h"
+#include "app/classes/file_storage.h"
 
-struct AppState {
-  // Window
-  RECT window_client_rect;
-  float client_width;
-  float client_height;
+struct app_state {
+	// Window
+	RECT window_client_rect;
+	float client_width;
+	float client_height;
 
-  // FileStorage
-  FileStorage files;
+	// FileStorage
+	file_storage files;
 };
 
 #endif
