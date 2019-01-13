@@ -5,13 +5,10 @@
 #include "utils/convert.h"  // WideToNarrowString
 #include "procedures/WM_DROPFILES.h"  // WM_DROPFILES_FUNC
 
-#include <iostream>
-#include <fstream>
-
 #include <string>
 
 #ifndef MAC_PLATFORM
-  #include "PIHeaders.h"
+ #include "PIHeaders.h"
 #endif
 
 LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -44,14 +41,14 @@ LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, 
           PostMessageW(window_handle, WM_CLOSE, 0, 0);
           break;
         case IDM_FILE_EXPORT: {
-		std::wofstream outfile("C:/Users/ptrckr/Desktop/Plugins/ReproMatic/win32/build/debug.txt");
+                std::wstring tmp;
 
 		for (auto it = state->files.drives.cbegin(); it != state->files.drives.cend(); ++it) {
-			outfile << it->first << "\n";
-			outfile << it->second.to_string() << "\n";
+			tmp += it->first + L"\n";
+			tmp += it->second.to_string() + L"\n";
 		}
 
-		outfile.close();
+		MessageBoxW(window_handle, tmp.c_str(), L"Export View", MB_OK);
           } break;
       }
       break;
