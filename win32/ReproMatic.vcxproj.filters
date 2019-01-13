@@ -23,6 +23,9 @@
     <ClCompile Include="..\sources\app\classes\file_storage.cc">
       <Filter>App\classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\sources\utils\string.cc">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sources\acrobat_utils.h" />
@@ -45,6 +48,9 @@
     </ClInclude>
     <ClInclude Include="..\sources\app\classes\file_storage.h">
       <Filter>App\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\utils\string.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -17,6 +17,7 @@
     <ClCompile Include="..\sources\main.cc" />
     <ClCompile Include="..\sources\plugin_data.cc" />
     <ClCompile Include="..\sources\utils\convert.cc" />
+    <ClCompile Include="..\sources\utils\string.cc" />
     <ClInclude Include="..\sources\app\classes\file_storage.h" />
     <ClInclude Include="..\sources\app\procedures\WM_DROPFILES.h" />
     <ClInclude Include="..\sources\app\state.h" />
@@ -29,6 +30,7 @@
     <ClInclude Include="..\sources\app\create_window.h" />
     <ClInclude Include="..\sources\app\procedure.h" />
     <ClInclude Include="..\sources\plugin_data.h" />
+    <ClInclude Include="..\sources\utils\string.h" />
     <ClInclude Include="resources.h" />
   </ItemGroup>
   <ItemGroup>

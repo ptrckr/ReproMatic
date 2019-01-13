@@ -3,9 +3,10 @@
 #include "WinUser.h"  // WM_APP
 
 IDR_REPROMATIC_MENU MENU {
-  POPUP "File" {
-    MENUITEM "Close", IDM_FILE_CLOSE
-  }
+        POPUP "File" {
+                MENUITEM "Close", IDM_FILE_CLOSE
+                MENUITEM "Export", IDM_FILE_EXPORT
+        }
 }
 
 IDB_OVERVIEW_ICON_16 ICON "../resources/overview_icon_16.ico"

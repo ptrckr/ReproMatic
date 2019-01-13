@@ -4,7 +4,7 @@
 #include "app/state.h"
 
 #ifndef MAC_PLATFORM
-  #include "PIHeaders.h"
+#include "PIHeaders.h"
 #endif
 
 int WM_DROPFILES_FUNC(app_state *state, HWND window_handle, HDROP hdrop);

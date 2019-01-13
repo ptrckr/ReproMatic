@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 #include <filesystem>
 
 namespace fs = std::tr2::sys;
@@ -12,29 +13,39 @@ namespace fs = std::tr2::sys;
 #endif
 
 struct page {
-	int number;
+        int number;
 };
 
 struct file {
-	fs::wpath path;
-	std::vector<page> pages;
+        fs::wpath path;
+        std::vector<page> pages;
 
-	bool is_damaged;
-	bool is_protected;
+        bool is_damaged;
+        bool is_protected;
+
+        file(std::wstring path) : path(path) {}
+        file(fs::wpath path) : path(path) {}
+
+        std::wstring to_string(int level) const;
 };
 
 struct folder {
-	fs::wpath path;
-	std::vector<file> files;
+        fs::wpath path;
+        std::map<std::wstring, folder> folders;
+        std::map<std::wstring, file> files;
 
-	bool contains_all_files;
+        folder(std::wstring path) : path(path) {}
+        folder(fs::wpath path) : path(path) {}
+
+        bool contains_all_files;
+        std::wstring to_string(int level = 0) const;
 };
 
-struct file_storage {
-	std::vector<folder> folders;
+struct file_tree {
+        std::map<std::wstring, folder> drives;
 
-	void add_file(std::wstring _path);
-	std::wstring GetAddedFiles();
+        void add_file(std::wstring _path);
 };
+
 
 #endif
