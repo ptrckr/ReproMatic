@@ -10,6 +10,15 @@
 
 namespace fs = std::tr2::sys;
 
+#ifndef MAC_PLATFORM
+#pragma comment(lib, "shlwapi.lib")
+#include "shlwapi.h"  // StrCmpLogicalW()
+#endif
+
+bool string_logical_cmp::operator() (const std::wstring &lhs, const std::wstring &rhs) const {
+        return StrCmpLogicalW(lhs.c_str(), rhs.c_str()) == -1 ? true : false;
+}
+
 std::wstring file::to_string(int level) const
 {
         std::wstring tmp;
@@ -23,7 +32,7 @@ std::wstring folder::to_string(int level) const
 {
         ++level;
         std::wstring tmp;
-        std::map<std::wstring, folder> folders = this->folders;
+        auto folders = this->folders;
 
         for(auto folder = folders.cbegin(); folder != folders.cend(); ++folder) {
                 tmp += std::wstring(level, L'-') + L" " + std::wstring(folder->first) + L"\n";
@@ -54,7 +63,7 @@ void file_tree::add_file(std::wstring _path)
                 current_path /= L"/";
 
                 if (fs::is_directory(current_path)) {
-                        std::map<std::wstring, folder> &root_sub_folders =
+                        auto &root_sub_folders =
                                 (component == path.begin() ? this->drives : root_folder->second.folders);
 
                         auto folder_exists = root_sub_folders.find(*component);
@@ -65,7 +74,7 @@ void file_tree::add_file(std::wstring _path)
                                 root_folder = folder_exists;
                         }
                 } else if (fs::is_regular_file(current_path) && to_lowercase(path.extension()) == L".pdf") {
-                        std::map<std::wstring, file> &root_sub_files = root_folder->second.files;
+                        auto &root_sub_files = root_folder->second.files;
 
                         if (root_sub_files.find(*component) == root_sub_files.end()) {
                                 root_sub_files.emplace(*component, current_path);
