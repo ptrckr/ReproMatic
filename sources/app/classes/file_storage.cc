@@ -1,6 +1,6 @@
 #include "app/classes/file_storage.h"
 
-#include "utils/convert.h"  // to_lowercase()
+#include "utils/convert.h"  // wide_to_narrow_str(), to_lowercase()
 
 #include <vector>
 #include <string>
@@ -11,12 +11,51 @@
 namespace fs = std::tr2::sys;
 
 #ifndef MAC_PLATFORM
+#include "PIHeaders.h"
 #pragma comment(lib, "shlwapi.lib")
 #include "shlwapi.h"  // StrCmpLogicalW()
 #endif
 
 bool string_logical_cmp::operator() (const std::wstring &lhs, const std::wstring &rhs) const {
         return StrCmpLogicalW(lhs.c_str(), rhs.c_str()) == -1 ? true : false;
+}
+
+file::file(fs::wpath path) : path(path)
+{
+        ASPathName as_path = ASFileSysCreatePathName(
+                ASGetDefaultUnicodeFileSys(),
+                ASAtomFromString("Cstring"),
+                wide_to_narrow_str(path.string()).c_str(),
+                NULL
+        );
+
+        if (as_path == NULL) {
+                MessageBoxW(NULL, L"Could not create acrobat path.", L"", MB_OK);
+                return;
+        }
+
+        DURING
+                PDDoc pd_doc = PDDocOpen(as_path, ASGetDefaultUnicodeFileSys(), NULL, true);
+                
+                ASInt32 page_count = PDDocGetNumPages(pd_doc);
+
+                MessageBoxW(
+                        NULL,
+                        (std::wstring(L"Document has ") + std::to_wstring(page_count) + L" pages.").c_str(),
+                        path.string().c_str(),
+                        MB_OK                        
+                );
+
+                PDDocClose(pd_doc);
+        HANDLER
+                // TODO: Handle error/damged file.
+                char buffer[1024];
+                memset(buffer, 0, 1024);  
+                const char *msg = ASGetErrorString(ERRORCODE, buffer, 1024);
+                MessageBoxA(NULL, msg, std::to_string(ERRORCODE).c_str(), MB_OK);
+        END_HANDLER
+
+        ASFileSysReleasePath(nullptr, as_path);
 }
 
 std::wstring file::to_string(int level) const
@@ -60,7 +99,7 @@ void file_tree::add_file(std::wstring _path)
 
                 current_path.append((*component).begin(), (*component).end());
                 if (fs::is_directory(path) || component != --path.end())
-                current_path /= L"/";
+                        current_path /= L"/";
 
                 if (fs::is_directory(current_path)) {
                         auto &root_sub_folders =

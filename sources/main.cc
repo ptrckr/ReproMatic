@@ -1,7 +1,7 @@
 #include "plugin_data.h"
 #include "app/create_window.h"
 #include "acrobat_utils.h"  // ACROBAT_UTILS::MenuManager
-#include "utils/convert.h"  // WideToNarrowString
+#include "utils/convert.h"  // wide_to_narrow_str()
 
 #include <string>
 
@@ -12,7 +12,7 @@
 static MenuManager menu_manager;
 
 ASAtom GetExtensionName() {
-  return ASAtomFromString(WideToNarrowString(PluginData::EXTENSION_NAME).c_str());
+  return ASAtomFromString(wide_to_narrow_str(PluginData::EXTENSION_NAME).c_str());
 }
 
 ACCB1 ASBool ACCB2 PluginExportHFTs(void) {

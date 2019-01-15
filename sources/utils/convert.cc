@@ -6,7 +6,7 @@
 #include <ctype.h>  // towlower
 #include <string>
 
-std::string WideToNarrowString(std::wstring wide_string) {
+std::string wide_to_narrow_str(std::wstring wide_string) {
   using convert_type = std::codecvt_utf8<wchar_t>;
   std::wstring_convert<convert_type, wchar_t> converter;
 

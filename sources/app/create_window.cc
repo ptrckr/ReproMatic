@@ -64,12 +64,7 @@ ACCB1 void ACCB2 LaunchRepromaticWindow(void *clientData) {
   );
 
   if(window_handle == NULL) {
-    auto err = std::to_string(GetLastError());
-        AVAlertNote(
-                (
-                        std::string("`CreateWindowExW' failed, the window could not be created.") + err).c_str()
-                
-        );
+    AVAlertNote("`CreateWindowExW' failed, the window could not be created.");
     UnregisterClassW(window_class.lpszClassName, gHINSTANCE);
     return;
   }

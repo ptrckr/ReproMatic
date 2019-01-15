@@ -6,7 +6,7 @@
 #include <exception>
 
 #include "plugin_data.h"
-#include "utils/convert.h"  // WideToNarrowString
+#include "utils/convert.h"  // wide_to_narrow_str()
 
 #ifndef MAC_PLATFORM
   #include "PIMain.h"
@@ -16,13 +16,13 @@ void MenuManager::Init() {
   if (app_menubar = AVAppGetMenubar()) {
     acrobat_main_menu = AVMenubarAcquireMenuByName(
       app_menubar,
-      WideToNarrowString(PluginData::FULL_DEV_PLUGIN_NAME).c_str()
+      wide_to_narrow_str(PluginData::FULL_DEV_PLUGIN_NAME).c_str()
     );
 
     if (!acrobat_main_menu) {
       acrobat_main_menu = AVMenuNew(
-        WideToNarrowString(PluginData::FULL_PLUGIN_NAME).c_str(),
-        WideToNarrowString(PluginData::FULL_DEV_PLUGIN_NAME).c_str(),
+        wide_to_narrow_str(PluginData::FULL_PLUGIN_NAME).c_str(),
+        wide_to_narrow_str(PluginData::FULL_DEV_PLUGIN_NAME).c_str(),
         gExtensionID
       );
 
@@ -56,14 +56,14 @@ AVMenu MenuManager::CreateMenu(std::wstring menu_name) {
   }
 
   AVMenu menu = AVMenuNew(
-    WideToNarrowString(menu_name).c_str(),
-    WideToNarrowString(PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
+    wide_to_narrow_str(menu_name).c_str(),
+    wide_to_narrow_str(PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
     gExtensionID
   );
 
   AVMenuItem menu_item = AVMenuItemNew(
-    WideToNarrowString(menu_name).c_str(),
-    WideToNarrowString(PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
+    wide_to_narrow_str(menu_name).c_str(),
+    wide_to_narrow_str(PluginData::DEVELOPER_PREFIX + menu_name).c_str(),
     menu, true, NO_SHORTCUT, 0,
     NULL,
     gExtensionID
@@ -84,8 +84,8 @@ void MenuManager::AddMenuItemToMenu(
     AVComputeEnabledProc menu_item_is_enabled) {
   AVMenu parent_menu = CreateMenu(menu);
   AVMenuItem menu_item = AVMenuItemNew(
-    WideToNarrowString(menu_item_name).c_str(),
-    WideToNarrowString(PluginData::DEVELOPER_PREFIX + menu_item_name).c_str(),
+    wide_to_narrow_str(menu_item_name).c_str(),
+    wide_to_narrow_str(PluginData::DEVELOPER_PREFIX + menu_item_name).c_str(),
     NULL, true, NO_SHORTCUT, 0, NULL,
     gExtensionID
   );

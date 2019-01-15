@@ -2,7 +2,7 @@
 
 #include "app/state.h"
 #include "resources.h"
-#include "utils/convert.h"  // WideToNarrowString()
+#include "utils/convert.h"  // wide_to_narrow_str()
 #include "procedures/WM_DROPFILES.h"  // WM_DROPFILES_FUNC()
 
 #include <string>
