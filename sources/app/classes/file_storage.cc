@@ -16,6 +16,9 @@ namespace fs = std::tr2::sys;
 #include "shlwapi.h"  // StrCmpLogicalW()
 #endif
 
+#include <iomanip>
+#include <sstream>
+
 bool string_logical_cmp::operator() (const std::wstring &lhs, const std::wstring &rhs) const {
         return StrCmpLogicalW(lhs.c_str(), rhs.c_str()) == -1 ? true : false;
 }
@@ -23,19 +26,19 @@ bool string_logical_cmp::operator() (const std::wstring &lhs, const std::wstring
 file::file(fs::wpath path) : path(path)
 {
         ASPathName as_path = ASFileSysCreatePathName(
-                ASGetDefaultUnicodeFileSys(),
+                NULL,
                 ASAtomFromString("Cstring"),
                 wide_to_narrow_str(path.string()).c_str(),
                 NULL
         );
 
         if (as_path == NULL) {
-                MessageBoxW(NULL, L"Could not create acrobat path.", L"", MB_OK);
+                MessageBoxW(NULL, L"Could not create acrobat path.", path.string().c_str(), MB_OK);
                 return;
         }
 
         DURING
-                PDDoc pd_doc = PDDocOpen(as_path, ASGetDefaultUnicodeFileSys(), NULL, true);
+                PDDoc pd_doc = PDDocOpen(as_path, NULL, NULL, true);
                 
                 ASInt32 page_count = PDDocGetNumPages(pd_doc);
 
@@ -52,7 +55,7 @@ file::file(fs::wpath path) : path(path)
                 char buffer[1024];
                 memset(buffer, 0, 1024);  
                 const char *msg = ASGetErrorString(ERRORCODE, buffer, 1024);
-                MessageBoxA(NULL, msg, std::to_string(ERRORCODE).c_str(), MB_OK);
+                MessageBoxA(NULL, msg, "error", MB_OK);
         END_HANDLER
 
         ASFileSysReleasePath(nullptr, as_path);

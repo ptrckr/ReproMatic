@@ -6,11 +6,14 @@
 #include <ctype.h>  // towlower
 #include <string>
 
-std::string wide_to_narrow_str(std::wstring wide_string) {
-  using convert_type = std::codecvt_utf8<wchar_t>;
-  std::wstring_convert<convert_type, wchar_t> converter;
+#include "windows.h"
 
-  return converter.to_bytes(wide_string);
+std::string wide_to_narrow_str(std::wstring wide_str) {
+        size_t buffer_size = WideCharToMultiByte(CP_ACP, 0, wide_str.c_str(), -1, NULL, 0, NULL, NULL);
+        std::string narrow_str(buffer_size, 0);
+        WideCharToMultiByte(CP_ACP, 0, wide_str.c_str(), -1, &narrow_str[0], buffer_size, NULL, NULL);
+
+        return narrow_str;
 }
 
 std::wstring to_lowercase(std::wstring s)
