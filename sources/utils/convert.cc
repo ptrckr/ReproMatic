@@ -1,4 +1,4 @@
-#include "convert.h"
+﻿#include "convert.h"
 
 #include <locale>  // std::wstring_convert
 #include <codecvt>  // std::codecvt_utf8
@@ -8,12 +8,20 @@
 
 #include "windows.h"
 
-std::string wide_to_narrow_str(std::wstring wide_str) {
-        size_t buffer_size = WideCharToMultiByte(CP_ACP, 0, wide_str.c_str(), -1, NULL, 0, NULL, NULL);
-        std::string narrow_str(buffer_size, 0);
-        WideCharToMultiByte(CP_ACP, 0, wide_str.c_str(), -1, &narrow_str[0], buffer_size, NULL, NULL);
+std::string wide_to_narrow_str(std::wstring wstr) {
+        size_t buffer_size = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+        std::string str(buffer_size, 0);
+        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &str[0], buffer_size, NULL, NULL);
 
-        return narrow_str;
+        return str;
+}
+
+std::wstring narrow_to_wide_str(std::string str) {
+        size_t buffer_size = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+        std::wstring wstr(buffer_size, 0);
+        MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &wstr[0], buffer_size);
+
+        return wstr;
 }
 
 std::wstring to_lowercase(std::wstring s)

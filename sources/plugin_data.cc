@@ -1,4 +1,4 @@
-#include "plugin_data.h"
+﻿#include "plugin_data.h"
 
 #include <string>
 

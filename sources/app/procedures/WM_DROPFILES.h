@@ -1,4 +1,4 @@
-#ifndef WM_DROPFILES_H
+﻿#ifndef WM_DROPFILES_H
 #define WM_DROPFILES_H
 
 #include "app/state.h"

@@ -1,4 +1,4 @@
-#include "WM_DROPFILES.h"
+﻿#include "WM_DROPFILES.h"
 
 #include "app/state.h"
 #include "app/classes/file_storage.h"

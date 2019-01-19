@@ -1,6 +1,8 @@
-#include "app/classes/file_storage.h"
+﻿#include "app/classes/file_storage.h"
 
 #include "utils/convert.h"  // wide_to_narrow_str(), to_lowercase()
+#include "utils/acro.h"  // wstr_to_as_path()
+#include "utils/win.h"  // alert()
 
 #include <vector>
 #include <string>
@@ -16,38 +18,25 @@ namespace fs = std::tr2::sys;
 #include "shlwapi.h"  // StrCmpLogicalW()
 #endif
 
-#include <iomanip>
-#include <sstream>
-
 bool string_logical_cmp::operator() (const std::wstring &lhs, const std::wstring &rhs) const {
         return StrCmpLogicalW(lhs.c_str(), rhs.c_str()) == -1 ? true : false;
 }
 
 file::file(fs::wpath path) : path(path)
 {
-        ASPathName as_path = ASFileSysCreatePathName(
-                NULL,
-                ASAtomFromString("Cstring"),
-                wide_to_narrow_str(path.string()).c_str(),
-                NULL
-        );
+        as_path as_path(path);
 
-        if (as_path == NULL) {
-                MessageBoxW(NULL, L"Could not create acrobat path.", path.string().c_str(), MB_OK);
+        if (!as_path.is_valid()) {
+                alert(L"Couldn't create ASPathName from path `" + path.string() + L"`.", std::to_wstring(__LINE__));
                 return;
         }
 
         DURING
-                PDDoc pd_doc = PDDocOpen(as_path, NULL, NULL, true);
+                PDDoc pd_doc = PDDocOpen(as_path.path, NULL, NULL, true);
                 
                 ASInt32 page_count = PDDocGetNumPages(pd_doc);
 
-                MessageBoxW(
-                        NULL,
-                        (std::wstring(L"Document has ") + std::to_wstring(page_count) + L" pages.").c_str(),
-                        path.string().c_str(),
-                        MB_OK                        
-                );
+                alert(std::wstring(L"Document has ") + std::to_wstring(page_count) + L" pages.", path.string());
 
                 PDDocClose(pd_doc);
         HANDLER
@@ -57,8 +46,6 @@ file::file(fs::wpath path) : path(path)
                 const char *msg = ASGetErrorString(ERRORCODE, buffer, 1024);
                 MessageBoxA(NULL, msg, "error", MB_OK);
         END_HANDLER
-
-        ASFileSysReleasePath(nullptr, as_path);
 }
 
 std::wstring file::to_string(int level) const

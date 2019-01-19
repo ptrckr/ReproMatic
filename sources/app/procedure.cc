@@ -1,4 +1,4 @@
-#include "procedure.h"
+﻿#include "procedure.h"
 
 #include "app/state.h"
 #include "resources.h"
@@ -12,14 +12,14 @@
 #endif
 
 LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, LPARAM lParam) {
-        app_state* state;
+        app_state *state;
         if (msg != WM_CREATE && msg != WM_NCCREATE) {
-                LONG_PTR ptr = GetWindowLongPtr(window_handle, GWLP_USERDATA);
+                LONG_PTR userdata = GetWindowLongPtr(window_handle, GWLP_USERDATA);
 
-                if (ptr == 0)
+                if (userdata == 0)
                         return 0;
                      
-                state = reinterpret_cast<app_state*>(ptr);  
+                state = reinterpret_cast<app_state*>(userdata);  
         }
 
         switch(msg) {

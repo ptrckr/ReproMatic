@@ -1,4 +1,4 @@
-#ifndef STATE_H
+﻿#ifndef STATE_H
 #define STATE_H
 
 #include "app/classes/file_storage.h"

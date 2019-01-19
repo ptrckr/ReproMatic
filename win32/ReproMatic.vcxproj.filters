@@ -26,6 +26,12 @@
     <ClCompile Include="..\sources\utils\string.cc">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\sources\utils\win.cc">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\utils\acro.cc">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sources\acrobat_utils.h" />
@@ -50,6 +56,12 @@
       <Filter>App\classes</Filter>
     </ClInclude>
     <ClInclude Include="..\sources\utils\string.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\utils\win.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\utils\acro.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

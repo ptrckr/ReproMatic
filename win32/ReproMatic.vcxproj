@@ -16,11 +16,14 @@
     <ClCompile Include="..\sources\app\state.cc" />
     <ClCompile Include="..\sources\main.cc" />
     <ClCompile Include="..\sources\plugin_data.cc" />
+    <ClCompile Include="..\sources\utils\acro.cc" />
     <ClCompile Include="..\sources\utils\convert.cc" />
     <ClCompile Include="..\sources\utils\string.cc" />
+    <ClCompile Include="..\sources\utils\win.cc" />
     <ClInclude Include="..\sources\app\classes\file_storage.h" />
     <ClInclude Include="..\sources\app\procedures\WM_DROPFILES.h" />
     <ClInclude Include="..\sources\app\state.h" />
+    <ClInclude Include="..\sources\utils\acro.h" />
     <ClInclude Include="..\sources\utils\convert.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -31,6 +34,7 @@
     <ClInclude Include="..\sources\app\procedure.h" />
     <ClInclude Include="..\sources\plugin_data.h" />
     <ClInclude Include="..\sources\utils\string.h" />
+    <ClInclude Include="..\sources\utils\win.h" />
     <ClInclude Include="resources.h" />
   </ItemGroup>
   <ItemGroup>

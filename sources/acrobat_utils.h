@@ -1,4 +1,4 @@
-#ifndef REPROMATIC_ACROBAT_UTILS_H
+﻿#ifndef REPROMATIC_ACROBAT_UTILS_H
 #define REPROMATIC_ACROBAT_UTILS_H
 
 #include <vector>

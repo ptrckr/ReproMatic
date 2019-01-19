@@ -1,4 +1,4 @@
-#include "app/create_window.h"
+﻿#include "app/create_window.h"
 
 #include "plugin_data.h"
 #include "app/state.h"

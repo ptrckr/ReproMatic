@@ -1,4 +1,4 @@
-#ifndef VERSIONING_H
+﻿#ifndef VERSIONING_H
 #define VERSIONING_H
 
 #include <string>
