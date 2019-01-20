@@ -27,7 +27,7 @@ file::file(fs::wpath path) : path(path)
         as_path as_path(path);
 
         if (!as_path.is_valid()) {
-                alert(L"Couldn't create ASPathName from path `" + path.string() + L"`.", std::to_wstring(__LINE__));
+                alert(L"Couldn't create ASPathName from path `" + path.string() + L"`.");
                 return;
         }
 
@@ -36,7 +36,7 @@ file::file(fs::wpath path) : path(path)
                 
                 ASInt32 page_count = PDDocGetNumPages(pd_doc);
 
-                alert(std::wstring(L"Document has ") + std::to_wstring(page_count) + L" pages.", path.string());
+                alert(std::wstring(L"Document has ") + std::to_wstring(page_count) + L" pages.");
 
                 PDDocClose(pd_doc);
         HANDLER
