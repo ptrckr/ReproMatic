@@ -1,6 +1,6 @@
 ﻿#include "app/classes/file_storage.h"
 
-#include "utils/convert.h"  // wide_to_narrow_str(), to_lowercase()
+#include "utils/convert.h"  // wide_to_narrow_str(), to_lowercase(), pt_to_mm()
 #include "utils/acro.h"  // wstr_to_as_path()
 #include "utils/win.h"  // alert()
 
@@ -8,7 +8,7 @@
 #include <string>
 #include <map>
 #include <filesystem>  // std::tr2::sys, fs::path, .string(), .extension(), .parent_path()
-#include <algorithm>  // std::find_if()
+#include <algorithm>  // std::find_if(), std::swap()
 
 namespace fs = std::tr2::sys;
 
@@ -22,11 +22,42 @@ bool string_logical_cmp::operator() (const std::wstring &lhs, const std::wstring
         return StrCmpLogicalW(lhs.c_str(), rhs.c_str()) == -1 ? true : false;
 }
 
+page::page(PDPage pd_page, int number) : number(number)
+{
+        this->set_size(pd_page);
+}
+
+void page::set_size(PDPage pd_page)
+{
+        ASFixedRect cropbox;
+        PDPageGetCropBox(pd_page, &cropbox);
+        this->size = {
+                pt_to_mm(ASFixedToFloat(cropbox.right - cropbox.left)),
+                pt_to_mm(ASFixedToFloat(cropbox.top - cropbox.bottom))
+        };
+
+        PDRotate rotation = PDPageGetRotate(pd_page);
+        if (rotation == 90 || rotation == 270) {
+                std::swap(this->size.width, this->size.height);
+        }
+}
+
+int page::get_display_page_number() const
+{
+        return this->number + 1;
+}
+
+std::wstring page::to_string() const
+{
+        return L"#" + std::to_wstring(this->number) + L" [" + std::to_wstring(this->size.width) + L" x " + std::to_wstring(this->size.height) + L"]";
+}
+
 file::file(fs::wpath path) : path(path)
 {
         as_path as_path(path);
 
         if (!as_path.is_valid()) {
+                this->exists = false;
                 alert(L"Couldn't create ASPathName from path `" + path.string() + L"`.");
                 return;
         }
@@ -34,13 +65,20 @@ file::file(fs::wpath path) : path(path)
         DURING
                 PDDoc pd_doc = PDDocOpen(as_path.path, NULL, NULL, true);
                 
-                ASInt32 page_count = PDDocGetNumPages(pd_doc);
+                for (int i = 0; i < PDDocGetNumPages(pd_doc); ++i) {
+                        PDPage pd_page = PDDocAcquirePage(pd_doc, i);
+                        page page(pd_page, i);
+                        
+                        this->pages.push_back(page);
 
-                alert(std::wstring(L"Document has ") + std::to_wstring(page_count) + L" pages.");
+                        PDPageRelease(pd_page);
+                }
 
                 PDDocClose(pd_doc);
         HANDLER
-                // TODO: Handle error/damged file.
+                this->is_damaged = true;
+
+                // TODO: Handle error/damaged file.
                 char buffer[1024];
                 memset(buffer, 0, 1024);  
                 const char *msg = ASGetErrorString(ERRORCODE, buffer, 1024);
@@ -52,7 +90,16 @@ std::wstring file::to_string(int level) const
 {
         std::wstring tmp;
         
-        tmp += std::wstring(level, ' ') + L" | " + this->path.filename() + L"\n";
+        tmp += std::wstring(level, ' ') + L" | " + this->path.filename() + L": ";
+
+         for (auto &it = this->pages.begin(); it != this->pages.end(); ++it) {
+                tmp.append(it->to_string());
+
+                if (it != --this->pages.end())
+                        tmp.append(L", ");
+        }
+
+        tmp += L"\n";
 
         return tmp;
 }

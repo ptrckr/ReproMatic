@@ -8,4 +8,7 @@ std::wstring narrow_to_wide_str(std::string str);
 std::wstring to_lowercase(std::wstring input);
 std::string to_lowercase(std::string input);
 
+float pt_to_mm(float pt);
+float mm_to_pt(float mm);
+
 #endif

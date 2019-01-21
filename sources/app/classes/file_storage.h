@@ -16,17 +16,28 @@ struct string_logical_cmp {
         bool operator() (const std::wstring &lhs, const std::wstring &rhs) const;
 };
 
+struct size {
+        float width;
+        float height;
+};
+
 struct page {
         int number;
+        size size;
 
-        page(int number) : number(number) {};
+        page(PDPage pd_page, int number);
+        
+        void set_size(PDPage pd_page);
+        int get_display_page_number() const;
+        std::wstring to_string() const;
 };
 
 struct file {
         fs::wpath path;
         std::vector<page> pages;
 
-        bool is_damaged;
+        bool exists = true;
+        bool is_damaged = false;
         bool is_protected;
 
         file(fs::wpath path);

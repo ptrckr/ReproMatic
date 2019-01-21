@@ -35,3 +35,11 @@ std::string to_lowercase(std::string s)
 	std::transform(s.begin(), s.end(), s.begin(), tolower);
 	return s;
 }
+
+float pt_to_mm(float pt) {
+        return pt * 0.352777778f;
+}
+
+float mm_to_pt(float mm) {
+        return mm * 2.83464567f;
+}
