@@ -2,7 +2,7 @@
 
 #include <locale>  // std::wstring_convert
 #include <codecvt>  // std::codecvt_utf8
-#include <algorithm>  // std::transform
+#include <algorithm>  // std::transform, std::remove()
 #include <ctype.h>  // towlower
 #include <string>
 
@@ -12,6 +12,7 @@ std::string wide_to_narrow_str(std::wstring wstr) {
         size_t buffer_size = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
         std::string str(buffer_size, 0);
         WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &str[0], buffer_size, NULL, NULL);
+        str.erase(std::remove(str.begin(), str.end(), '\0'), str.end());
 
         return str;
 }
