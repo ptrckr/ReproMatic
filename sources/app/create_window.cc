@@ -8,8 +8,8 @@
 #include <string>  // std::to_string
 
 #ifndef MAC_PLATFORM
-  #include "PIMain.h"  // gHINSTANCE
-  #include "PIHeaders.h"
+#include "PIMain.h"  // gHINSTANCE
+#include "PIHeaders.h"
 #endif
 
 ACCB1 void ACCB2 LaunchRepromaticWindow(void *clientData) {

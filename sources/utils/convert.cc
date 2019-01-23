@@ -10,17 +10,20 @@
 
 std::string wide_to_narrow_str(std::wstring wstr) {
         size_t buffer_size = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
-        std::string str(buffer_size, 0);
-        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &str[0], buffer_size, NULL, NULL);
-        str.erase(std::remove(str.begin(), str.end(), '\0'), str.end());
+        char *buffer = new char[buffer_size];
+        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, buffer, buffer_size, NULL, NULL);
+        std::string str(buffer);
+        delete[] buffer;
 
         return str;
 }
 
 std::wstring narrow_to_wide_str(std::string str) {
         size_t buffer_size = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
-        std::wstring wstr(buffer_size, 0);
-        MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &wstr[0], buffer_size);
+        wchar_t *buffer = new wchar_t[buffer_size];
+        MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, buffer, buffer_size);
+        std::wstring wstr(buffer);
+        delete[] buffer;
 
         return wstr;
 }

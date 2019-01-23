@@ -20,9 +20,6 @@
     <ClCompile Include="..\sources\app\procedures\WM_DROPFILES.cc">
       <Filter>App\procedures</Filter>
     </ClCompile>
-    <ClCompile Include="..\sources\app\classes\file_storage.cc">
-      <Filter>App\classes</Filter>
-    </ClCompile>
     <ClCompile Include="..\sources\utils\string.cc">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -32,6 +29,8 @@
     <ClCompile Include="..\sources\utils\acro.cc">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\sources\app\format.cc" />
+    <ClCompile Include="..\sources\app\file_storage.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\sources\acrobat_utils.h" />
@@ -52,9 +51,6 @@
     <ClInclude Include="..\sources\app\procedures\WM_DROPFILES.h">
       <Filter>App\procedures</Filter>
     </ClInclude>
-    <ClInclude Include="..\sources\app\classes\file_storage.h">
-      <Filter>App\classes</Filter>
-    </ClInclude>
     <ClInclude Include="..\sources\utils\string.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -64,6 +60,8 @@
     <ClInclude Include="..\sources\utils\acro.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\sources\app\format.h" />
+    <ClInclude Include="..\sources\app\file_storage.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources.rc" />
@@ -77,9 +75,6 @@
     </Filter>
     <Filter Include="App\procedures">
       <UniqueIdentifier>{c35e12e0-f4c2-4f9f-bae9-7228689f3500}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="App\classes">
-      <UniqueIdentifier>{923ab7e0-7342-48a8-833b-0ec9a501b4e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿#include "app/classes/file_storage.h"
+﻿#include "app/file_storage.h"
 
 #include "utils/convert.h"  // wide_to_narrow_str(), to_lowercase(), pt_to_mm()
 #include "utils/acro.h"  // wstr_to_as_path()
@@ -10,13 +10,13 @@
 #include <filesystem>  // std::tr2::sys, fs::path, .string(), .extension(), .parent_path()
 #include <algorithm>  // std::find_if(), std::swap()
 
-namespace fs = std::tr2::sys;
-
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
 #pragma comment(lib, "shlwapi.lib")
 #include "shlwapi.h"  // StrCmpLogicalW()
 #endif
+
+namespace fs = std::tr2::sys;
 
 bool string_logical_cmp::operator() (const std::wstring &lhs, const std::wstring &rhs) const {
         return StrCmpLogicalW(lhs.c_str(), rhs.c_str()) == -1 ? true : false;
@@ -49,7 +49,8 @@ int page::get_display_page_number() const
 
 std::wstring page::to_string() const
 {
-        return L"#" + std::to_wstring(this->number) + L" [" + std::to_wstring(this->size.width) + L" x " + std::to_wstring(this->size.height) + L"]";
+        return L"#" + std::to_wstring(this->number) + L" [" + std::to_wstring(this->size.width) +
+                L" x " + std::to_wstring(this->size.height) + L"]";
 }
 
 file::file(fs::wpath path) : path(path)

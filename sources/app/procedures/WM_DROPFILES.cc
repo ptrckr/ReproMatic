@@ -1,7 +1,7 @@
 ﻿#include "WM_DROPFILES.h"
 
 #include "app/state.h"
-#include "app/classes/file_storage.h"
+#include "app/file_storage.h"
 
 #include <string>
 
