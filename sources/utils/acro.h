@@ -2,8 +2,7 @@
 #define UTILS_ACRO_H
 
 #include <string>
-
-#include <filesystem>  // std::tr2::sys, fs::path, .string()
+#include <filesystem>  // std::tr2::sys, fs::wpath, .string()
 
 #ifndef MAC_PLATFORM
 #include "PIHeaders.h"
@@ -21,5 +20,7 @@ struct as_path {
 
         ~as_path();
 };
+
+fs::wpath get_acrobat_plugins_path();
 
 #endif

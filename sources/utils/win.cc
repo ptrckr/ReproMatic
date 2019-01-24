@@ -6,12 +6,8 @@
 #include <string>
 #include <filesystem>  // std::tr2::sys, fs::path, .filename()
 #include <stdexcept>
-
-#include "windows.h"
-
-#ifndef MAC_PLATFORM
+#include "windows.h"  // MessageBoxW(), LoadStringW()
 #include "PIMain.h"  // gHINSTANCE
-#endif
 
 namespace fs = std::tr2::sys;
 

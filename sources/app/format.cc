@@ -3,6 +3,7 @@
 #include "utils/string.h"  // split()
 #include "utils/win.h"  // alert(), get_wstr_resource()
 #include "utils/convert.h"  // wide_to_narrow_str()
+#include "utils/acro.h"  // get_acrobat_plugins_path()
 #include "resources.h"
 
 #include <vector>
@@ -79,7 +80,7 @@ void format::parse_spec_line(std::wstring line)
         try {
                 format_spec spec(line);
                 this->specs.push_back(spec);
-        } catch(const std::exception& e) {
+        } catch(const std::exception &e) {
                 alert(narrow_to_wide_str(e.what()));    
         }  
 }
@@ -95,9 +96,15 @@ std::vector<int> formats::predefined_formats = {
 
 formats::formats()
 {
+        try {
+                fs::wpath plugin_path = get_acrobat_plugins_path();
+                // TODO: Read user defined formats from path.
+        } catch(const std::exception &e) {
+               alert(narrow_to_wide_str(e.what()));  
+        }
+
         for (const int &id : formats::predefined_formats) {
                 try {
-                        // TODO: Read user defined formats from installation path.
                         // TODO: Add (more) standard formats.
                         format format(load_wstr(id));             
                         this->list.emplace(format.name, format);  
