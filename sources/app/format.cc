@@ -3,13 +3,14 @@
 #include "utils/string.h"  // split()
 #include "utils/win.h"  // alert(), get_wstr_resource()
 #include "utils/convert.h"  // wide_to_narrow_str()
-#include "utils/acro.h"  // get_acrobat_plugins_path()
+#include "utils/acro.h"  // get_user_format_path()
 #include "resources.h"
 
 #include <vector>
 #include <string>  // std::stof()
 #include <utility>  // std::pair
 #include <stdexcept>
+#include <fstream>  // std::ifstream
 
 format_spec::format_spec(std::wstring spec)
 { 
@@ -52,7 +53,7 @@ format::format(std::wstring config)
                 else if (type_desc.first == L"spec")
                         this->parse_spec_line(type_desc.second);
                 else if (type_desc.first == L"file_size_display")
-                        continue; // TODO
+                        this->parse_file_size_display_line(type_desc.second);
         }
         
         if (this->name.size() == 0)
@@ -87,29 +88,65 @@ void format::parse_spec_line(std::wstring line)
 
 void format::parse_file_size_display_line(std::wstring line)
 {
-        // TODO
+        this->file_size_display = line;
 }
 
 std::vector<int> formats::predefined_formats = {
+        // TODO: Add (more) standard formats.
         IDS_DIN_A
 };
 
 formats::formats()
 {
         try {
-                fs::wpath plugin_path = get_acrobat_plugins_path();
-                // TODO: Read user defined formats from path.
+                auto file = fs::wdirectory_iterator(get_user_format_path());
+                for (file; file != fs::wdirectory_iterator(); ++file) {
+                        if(std::ifstream stream{file->path().string(), std::ios::binary | std::ios::ate}) {
+                                auto size = stream.tellg();
+                                std::string contents(static_cast<unsigned int>(size), '\0');
+                                stream.seekg(0);
+                                if(stream.read(&contents[0], size)) {
+                                        format format(narrow_to_wide_str(contents));
+                                        this->list.emplace(format.name, format);
+                                } else {
+                                        throw std::runtime_error(std::string("Unable to read contents of `") +
+                                                wide_to_narrow_str(file->path().string()) + "'.");
+                                }
+                        } else {
+                                throw std::runtime_error(std::string("Unable to open file `") +
+                                        wide_to_narrow_str(file->path().string()) + "' for reading.");
+                        }
+                }
         } catch(const std::exception &e) {
                alert(narrow_to_wide_str(e.what()));  
         }
 
         for (const int &id : formats::predefined_formats) {
                 try {
-                        // TODO: Add (more) standard formats.
                         format format(load_wstr(id));             
                         this->list.emplace(format.name, format);  
                 } catch(const std::exception& e) {
                         alert(narrow_to_wide_str(e.what()));    
                 }
         }
+
+        try {
+                this->set_active_format(load_wstr(IDS_DEFAULT_FORMAT));       
+        } catch(const std::exception &e) {
+                alert(narrow_to_wide_str(e.what()));
+        }
+}
+
+void formats::set_active_format(std::wstring format)
+{
+        if (this->list.find(format) != this->list.end())
+                this->active_format = format;
+        else
+                throw std::invalid_argument(std::string("Could not find format `") +
+                        wide_to_narrow_str(format) + "'. Did not set active format.");
+}
+
+format formats::get_active_format() const
+{
+        return list.at(this->active_format);
 }

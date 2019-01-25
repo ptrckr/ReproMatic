@@ -4,13 +4,11 @@
 #include "app/file_storage.h"
 
 #include <string>
-
-#ifndef MAC_PLATFORM
-#include "PIHeaders.h"
 #include <shellapi.h>  // DragQueryFileW()
-#endif
+#include "PIHeaders.h"
 
-int WM_DROPFILES_FUNC(app_state *state, HWND window_handle, HDROP hdrop) {
+int WM_DROPFILES_FUNC(app_state *state, HWND window_handle, HDROP hdrop)
+{
 	int file_count = DragQueryFileW(hdrop, 0xFFFFFFFF, NULL, NULL);
 	if (file_count == 0) {
 		MessageBoxW(window_handle, L"Could not query filecount.",

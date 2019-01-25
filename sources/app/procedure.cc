@@ -6,12 +6,10 @@
 #include "procedures/WM_DROPFILES.h"  // WM_DROPFILES_FUNC()
 
 #include <string>
-
-#ifndef MAC_PLATFORM
 #include "PIHeaders.h"
-#endif
 
-LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, LPARAM lParam)
+{
         app_state *state;
         if (msg != WM_CREATE && msg != WM_NCCREATE) {
                 LONG_PTR userdata = GetWindowLongPtr(window_handle, GWLP_USERDATA);
@@ -25,7 +23,7 @@ LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, 
         switch(msg) {
         case WM_CREATE: {
                 // Set state pointer
-                CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(lParam);
+                CREATESTRUCT *create_struct = reinterpret_cast<CREATESTRUCT*>(lParam);
                 state = reinterpret_cast<app_state*>(create_struct->lpCreateParams);
                 SetWindowLongPtr(window_handle, GWLP_USERDATA, (LONG_PTR)state);
 

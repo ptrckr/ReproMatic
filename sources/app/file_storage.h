@@ -1,16 +1,15 @@
 ﻿#ifndef FILE_STORAGE_H
 #define FILE_STORAGE_H
 
+#include "format.h"
+
 #include <vector>
 #include <string>
 #include <map>
 #include <filesystem>
+#include "PIHeaders.h"
 
 namespace fs = std::tr2::sys;
-
-#ifndef MAC_PLATFORM
-#include "PIHeaders.h"
-#endif
 
 struct string_logical_cmp {
         bool operator() (const std::wstring &lhs, const std::wstring &rhs) const;
@@ -24,6 +23,7 @@ struct size {
 struct page {
         int number;
         size size;
+        format_spec formatted_size;
 
         page(PDPage pd_page, int number);
         
@@ -61,6 +61,7 @@ struct file_tree {
         std::map<std::wstring, folder, string_logical_cmp> drives;
 
         void add_file(std::wstring _path);
+        void format_files(format format);
 };
 
 

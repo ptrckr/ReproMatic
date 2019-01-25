@@ -21,6 +21,6 @@ struct as_path {
         ~as_path();
 };
 
-fs::wpath get_acrobat_plugins_path();
+fs::wpath get_user_format_path();
 
 #endif

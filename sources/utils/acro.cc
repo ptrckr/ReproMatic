@@ -1,7 +1,6 @@
 ﻿#include "utils/acro.h"
 
 #include "utils/convert.h"  // wide_to_narrow_str()
-#include "utils/win.h"  // get_env_var()
 
 #include <string>
 #include <algorithm>  // std::erase()
@@ -30,7 +29,7 @@ as_path::~as_path()
         ASFileSysReleasePath(NULL, this->path);
 }
 
-fs::wpath get_acrobat_plugins_path()
+fs::wpath get_user_format_path()
 {
         size_t buffer_size = MAX_PATH;
         std::wstring buffer(buffer_size, '\0');
@@ -43,13 +42,13 @@ fs::wpath get_acrobat_plugins_path()
                 buffer.resize(static_cast<size_t>(data_copied_size / sizeof(wchar_t)));
                 buffer.erase(std::remove(buffer.begin(), buffer.end(), '"'), buffer.end());
                 fs::wpath path(buffer);                
-                std::wstring plugin_dir = L"plug_ins";
-                path.remove_filename().append(plugin_dir.begin(), plugin_dir.end());
+                std::wstring user_formats = L"plug_ins/repromatic_formats";
+                path.remove_filename().append(user_formats.begin(), user_formats.end());
 
                 if (fs::exists(path) && fs::is_directory(path))
                         return path;
                 else
-                        throw std::runtime_error(std::string("Error calling get_acrobat_plugins_path,") +
+                        throw std::runtime_error(std::string("Error calling get_user_format_path,") +
                                 " the constructed path `" + wide_to_narrow_str(path.string()) +
                                 "' does not exist or is not a valid directory.");
         } else {

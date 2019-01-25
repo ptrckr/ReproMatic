@@ -7,10 +7,11 @@
 #include <utility>  // std::pair
 
 struct format_spec {
-        std::wstring name;
+        std::wstring name = L"";
         float width = -1.0;
         float height = -1.0;
 
+        format_spec::format_spec() {};
         format_spec::format_spec(std::wstring spec);
 };
 
@@ -26,11 +27,16 @@ struct format {
         void parse_file_size_display_line(std::wstring line);
 };
 
-struct formats { 
+struct formats {
+private:
+        std::wstring active_format;
         static std::vector<int> predefined_formats;
         std::map<std::wstring, format> list;
 
+public:
         formats();
+        void set_active_format(std::wstring format);
+        format get_active_format() const;
 };
 
 #endif
