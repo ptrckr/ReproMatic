@@ -10,6 +10,9 @@ struct app_state {
         float client_width;
         float client_height;
 
+        // Menu
+        HMENU format_menu;
+
         // Format
         formats formats;
 

@@ -150,3 +150,14 @@ format formats::get_active_format() const
 {
         return list.at(this->active_format);
 }
+
+std::vector<std::wstring> formats::get_formats() const
+{
+        std::vector<std::wstring> formats;
+
+        for (const auto &format : this->list) {
+                formats.push_back(format.first);
+        }
+
+        return formats;
+}

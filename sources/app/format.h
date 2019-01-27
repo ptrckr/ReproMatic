@@ -37,6 +37,7 @@ public:
         formats();
         void set_active_format(std::wstring format);
         format get_active_format() const;
+        std::vector<std::wstring> get_formats() const;
 };
 
 #endif

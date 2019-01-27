@@ -13,7 +13,6 @@
     <ClCompile Include="..\sources\app\file_storage.cc" />
     <ClCompile Include="..\sources\app\format.cc" />
     <ClCompile Include="..\sources\app\procedure.cc" />
-    <ClCompile Include="..\sources\app\procedures\WM_DROPFILES.cc" />
     <ClCompile Include="..\sources\app\state.cc" />
     <ClCompile Include="..\sources\main.cc" />
     <ClCompile Include="..\sources\plugin_data.cc" />
@@ -23,6 +22,7 @@
     <ClCompile Include="..\sources\utils\win.cc" />
     <ClInclude Include="..\sources\app\file_storage.h" />
     <ClInclude Include="..\sources\app\format.h" />
+    <ClInclude Include="..\sources\app\procedures\WM_COMMAND.h" />
     <ClInclude Include="..\sources\app\procedures\WM_DROPFILES.h" />
     <ClInclude Include="..\sources\app\state.h" />
     <ClInclude Include="..\sources\utils\acro.h" />

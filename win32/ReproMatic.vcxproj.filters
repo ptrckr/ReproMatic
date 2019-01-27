@@ -17,9 +17,6 @@
     <ClCompile Include="..\sources\app\state.cc">
       <Filter>App</Filter>
     </ClCompile>
-    <ClCompile Include="..\sources\app\procedures\WM_DROPFILES.cc">
-      <Filter>App\procedures</Filter>
-    </ClCompile>
     <ClCompile Include="..\sources\utils\string.cc">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -62,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="..\sources\app\format.h" />
     <ClInclude Include="..\sources\app\file_storage.h" />
+    <ClInclude Include="..\sources\app\procedures\WM_COMMAND.h">
+      <Filter>App\procedures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources.rc" />
