@@ -4,6 +4,7 @@
 #include "utils/win.h"  // alert(), get_wstr_resource()
 #include "utils/convert.h"  // wide_to_narrow_str()
 #include "utils/acro.h"  // get_user_format_path()
+#include "file_storage.h"  // size
 #include "resources.h"
 
 #include <vector>
@@ -12,7 +13,7 @@
 #include <stdexcept>
 #include <fstream>  // std::ifstream
 
-format_spec::format_spec(std::wstring spec)
+format_spec::format_spec(std::wstring spec) : name(L""), width(-1.0f), height(-1.0f)
 { 
         for (const std::wstring &kv_str : split(spec, L",")) {
                 auto kv_pair = split_once(kv_str, L"=");
@@ -91,15 +92,51 @@ void format::parse_file_size_display_line(std::wstring line)
         this->file_size_display = line;
 }
 
+format_spec format::get_formatted_size(size size, format format)
+{
+        format_spec spec;
+        spec.name = L"Test";
+
+        return spec;   
+}
+
+formats::formats()
+{
+        this->load_predefined_formats();
+        this->load_user_defined_formats();
+
+        try {
+                this->set_active_format(load_wstr(IDS_DEFAULT_FORMAT));       
+        } catch(const std::exception &e) {
+                alert(narrow_to_wide_str(e.what()));
+        }
+}
+
 std::vector<int> formats::predefined_formats = {
         // TODO: Add (more) standard formats.
         IDS_DIN_A
 };
 
-formats::formats()
+void formats::load_predefined_formats()
+{
+        for (const int &id : formats::predefined_formats) {
+                try {
+                        format format(load_wstr(id));             
+                        this->list.emplace(format.name, format);  
+                } catch(const std::exception& e) {
+                        alert(narrow_to_wide_str(e.what()));    
+                }
+        }
+}
+
+void formats::load_user_defined_formats()
 {
         try {
-                auto file = fs::wdirectory_iterator(get_user_format_path());
+                fs::wpath user_dir = get_user_format_path();
+                if (!fs::exists(user_dir))
+                        return;
+
+                auto file = fs::wdirectory_iterator(user_dir);
                 for (file; file != fs::wdirectory_iterator(); ++file) {
                         if(std::ifstream stream{file->path().string(), std::ios::binary | std::ios::ate}) {
                                 auto size = stream.tellg();
@@ -107,6 +144,7 @@ formats::formats()
                                 stream.seekg(0);
                                 if(stream.read(&contents[0], size)) {
                                         format format(narrow_to_wide_str(contents));
+                                        format.name = L"*" + format.name;
                                         this->list.emplace(format.name, format);
                                 } else {
                                         throw std::runtime_error(std::string("Unable to read contents of `") +
@@ -118,22 +156,7 @@ formats::formats()
                         }
                 }
         } catch(const std::exception &e) {
-               alert(narrow_to_wide_str(e.what()));  
-        }
-
-        for (const int &id : formats::predefined_formats) {
-                try {
-                        format format(load_wstr(id));             
-                        this->list.emplace(format.name, format);  
-                } catch(const std::exception& e) {
-                        alert(narrow_to_wide_str(e.what()));    
-                }
-        }
-
-        try {
-                this->set_active_format(load_wstr(IDS_DEFAULT_FORMAT));       
-        } catch(const std::exception &e) {
-                alert(narrow_to_wide_str(e.what()));
+                alert(narrow_to_wide_str(e.what()));  
         }
 }
 
