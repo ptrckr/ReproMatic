@@ -32,6 +32,8 @@ void WM_DROPFILES_FUNC(app_state *state, HWND window_handle, HDROP hdrop)
 		state->files.add_file(std::wstring(buffer));
 		delete[] buffer;
 	}
+
+        state->files.apply_format_to_pages(state->formats.get_active_format());
 }
 
 #endif

@@ -4,6 +4,8 @@
 #include "app/format.h"
 #include "app/file_storage.h"
 
+#include <map>
+
 struct app_state {
         // Window
         RECT window_client_rect;
@@ -11,6 +13,7 @@ struct app_state {
         float client_height;
 
         // Menu
+        std::map<int, std::wstring> format_menu_id_name_lookup; 
         HMENU format_menu;
 
         // Format

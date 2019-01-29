@@ -95,7 +95,8 @@ void format::parse_file_size_display_line(std::wstring line)
 format_spec format::get_formatted_size(size size, format format)
 {
         format_spec spec;
-        spec.name = L"Test";
+
+        spec.name = format.name;
 
         return spec;   
 }

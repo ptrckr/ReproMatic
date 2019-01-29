@@ -1,7 +1,7 @@
 ﻿#include "procedure.h"
 
 #include "app/state.h"
-#include "resources.h"  // IDM_FORMAT_ITEMS
+#include "resources.h"  // IDM_FORMAT_ITEMS_BEGIN
 #include "utils/convert.h"  // wide_to_narrow_str()
 #include "format.h"  // .get_formats()
 #include "procedures/WM_DROPFILES.h"  // WM_DROPFILES_FUNC()
@@ -44,16 +44,23 @@ LRESULT CALLBACK RepromaticWndProc(HWND window_handle, UINT msg, WPARAM wParam, 
                         assert_rv(L"CreatePopupMenu", format_menu == NULL ? false : true);
                         state->format_menu = format_menu;
 
+                        int ACTIVE_ID = -1;
+                        format active_format = state->formats.get_active_format();
                         std::vector<std::wstring> formats = state->formats.get_formats();
                         for (size_t i = 0; i < formats.size(); ++i) {
                                 std::wstring format = formats[i];
-                                rv = AppendMenu(state->format_menu, MF_STRING,
-                                        IDM_FORMAT_ITEMS + i, format.c_str());
+                                int id = IDM_FORMAT_ITEMS_BEGIN + i;
+
+                                state->format_menu_id_name_lookup.emplace(id, format);
+                                rv = AppendMenu(state->format_menu, MF_STRING, id, format.c_str());
                                 assert_rv(L"AppendMenu", rv);
+
+                                if (format == active_format.name)
+                                        ACTIVE_ID = IDM_FORMAT_ITEMS_BEGIN + i;
                         }
 
-                        rv = CheckMenuRadioItem(state->format_menu, IDM_FORMAT_ITEMS,
-                                IDM_FORMAT_ITEMS + formats.size() - 1, IDM_FORMAT_ITEMS, MF_BYCOMMAND);
+                        rv = CheckMenuRadioItem(state->format_menu, IDM_FORMAT_ITEMS_BEGIN,
+                                IDM_FORMAT_ITEMS_BEGIN + formats.size() - 1, ACTIVE_ID, MF_BYCOMMAND);
                         assert_rv(L"CheckMenuRadioItem", rv);
 
                         rv = AppendMenuW(GetMenu(window_handle), MF_STRING | MF_POPUP,

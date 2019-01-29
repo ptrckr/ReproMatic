@@ -2,22 +2,19 @@
 #define FILE_STORAGE_H
 
 #include "format.h"
+#include "size.h"
 
 #include <vector>
 #include <string>
 #include <map>
 #include <filesystem>
+#include <functional>
 #include "PIHeaders.h"
 
 namespace fs = std::tr2::sys;
 
 struct string_logical_cmp {
         bool operator() (const std::wstring &lhs, const std::wstring &rhs) const;
-};
-
-struct size {
-        float width;
-        float height;
 };
 
 struct page {
@@ -59,10 +56,10 @@ struct folder {
 
 struct file_tree {
         std::map<std::wstring, folder, string_logical_cmp> drives;
-
         void add_file(std::wstring _path);
-        void format_files(format format);
+        static void iterate(std::map<std::wstring, folder,
+                string_logical_cmp> &map, std::function<void(folder&)> cb);
+        void apply_format_to_pages(format format);
 };
-
 
 #endif

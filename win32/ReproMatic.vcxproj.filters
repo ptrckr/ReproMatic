@@ -62,6 +62,7 @@
     <ClInclude Include="..\sources\app\procedures\WM_COMMAND.h">
       <Filter>App\procedures</Filter>
     </ClInclude>
+    <ClInclude Include="..\sources\size.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources.rc" />

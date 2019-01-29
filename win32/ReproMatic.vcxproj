@@ -25,6 +25,7 @@
     <ClInclude Include="..\sources\app\procedures\WM_COMMAND.h" />
     <ClInclude Include="..\sources\app\procedures\WM_DROPFILES.h" />
     <ClInclude Include="..\sources\app\state.h" />
+    <ClInclude Include="..\sources\size.h" />
     <ClInclude Include="..\sources\utils\acro.h" />
     <ClInclude Include="..\sources\utils\convert.h">
       <FileType>CppCode</FileType>

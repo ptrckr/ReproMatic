@@ -10,6 +10,9 @@
 #include <map>
 #include <filesystem>  // std::tr2::sys, fs::path, .string(), .extension(), .parent_path()
 #include <algorithm>  // std::find_if(), std::swap()
+#include <sstream>
+#include <iomanip>  // std::setprecision
+#include <ios>  // std::fixed
 #pragma comment(lib, "shlwapi.lib")
 #include "shlwapi.h"  // StrCmpLogicalW()
 #include "PIHeaders.h"
@@ -49,8 +52,13 @@ int page::get_display_page_number() const
 
 std::wstring page::to_string() const
 {
-        return L"#" + std::to_wstring(this->number) + L" [" + std::to_wstring(this->size.width) +
-                L" x " + std::to_wstring(this->size.height) + L"]";
+        std::wstringstream tmp;
+        tmp << std::fixed << std::setprecision(0);
+        
+        tmp << L"#" << this->number << L"{" << this->formatted_size.name << L"}";
+        tmp << L" [" << this->size.width << L" x " << this->size.height << L"]";
+
+        return tmp.str();
 }
 
 file::file(fs::wpath path) : path(path)
@@ -160,13 +168,32 @@ void file_tree::add_file(std::wstring _path)
         }
 
         if (fs::is_directory(path)) {
-                for (auto file = fs::wdirectory_iterator(path); file != fs::wdirectory_iterator(); ++file) {
+                auto file = fs::wdirectory_iterator(path);
+                for (file; file != fs::wdirectory_iterator(); ++file) {
                         this->add_file(file->path());        
                 }
         }
 }
 
-void file_tree::format_files(format format)
+void file_tree::iterate(std::map<std::wstring, folder,
+        string_logical_cmp> &folders, std::function<void(folder&)> cb)
 {
-        // TODO
+        for (auto &root : folders) {
+                auto &root_folder = root.second;
+
+                cb(root_folder);
+
+                file_tree::iterate(root_folder.folders, cb);
+        }
+}
+
+void file_tree::apply_format_to_pages(format format)
+{
+        file_tree::iterate(this->drives, [&format](folder &folder) {
+                for (auto &file : folder.files) {
+                        for (auto &page : file.second.pages) {
+                                page.formatted_size = format::get_formatted_size(page.size, format);  
+                        }
+                }
+        });
 }
