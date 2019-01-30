@@ -5,6 +5,7 @@
   #include "PIHeaders.h"
 #endif
 
+void start_window();
 ACCB1 void ACCB2 LaunchRepromaticWindow(void *clientData);
 ACCB1 ASBool ACCB2 LaunchRepromaticWindowIsEnabled(void *clientData);
 
